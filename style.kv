@@ -20,14 +20,17 @@ Screen:
                     OneLineListItem:
                         text:"Home"
                         on_press:
+                            nav_drawer.set_state("close")
                             if screen_manager.current != "home": \
                             screen_manager.current = "home" ;
-
+                            nav_drawer.set_state("close")
                     OneLineListItem:
                         text: "About"
                         on_press:
+                            nav_drawer.set_state("close")
                             if screen_manager.current != "about": \
                             screen_manager.current = "about";
+                            nav_drawer.set_state("close")
                     OneLineListItem:
                         text: "Developer options"
                         on_press:
