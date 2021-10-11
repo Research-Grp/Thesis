@@ -1,0 +1,59 @@
+Screen:
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "My application"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("toggle")]]
+    MDNavigationLayout:
+        WindowManager:
+            id:screen_manager
+            HomeScreen:
+            AboutScreen:
+            DeveloperScreen:
+    MDNavigationDrawer:
+        id: nav_drawer
+        BoxLayout:
+            orientation: "vertical"
+            ScrollView:
+                MDList:
+                    OneLineListItem:
+                        text:"Home"
+                        on_press:
+                            if screen_manager.current != "home": \
+                            screen_manager.current = "home" ;
+
+                    OneLineListItem:
+                        text: "About"
+                        on_press:
+                            if screen_manager.current != "about": \
+                            screen_manager.current = "about";
+                    OneLineListItem:
+                        text: "Developer options"
+                        on_press:
+                            if screen_manager.current != "dev": \
+                            screen_manager.current = "dev";
+                            nav_drawer.set_state("close")
+
+
+<HomeScreen>:
+    name: "home"
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Welcome to the Home Screen!"
+            halign: "center"
+<AboutScreen>:
+    name: "about"
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Welcome to the About Screen!"
+            halign: "center"
+<DeveloperScreen>:
+    name: "dev"
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Welcome to the Developer Screen!"
+            halign: "center"
