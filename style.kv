@@ -8,6 +8,7 @@ Screen:
     MDNavigationLayout:
         WindowManager:
             id:screen_manager
+            LoadingScreen:
             HomeScreen:
             AboutScreen:
             DeveloperScreen:
@@ -23,6 +24,7 @@ Screen:
                             nav_drawer.set_state("close")
                             if screen_manager.current != "home": \
                             screen_manager.current = "home" ;
+                            screen_manager.transition.direction = "right"
                             nav_drawer.set_state("close")
                     OneLineListItem:
                         text: "About"
@@ -30,14 +32,20 @@ Screen:
                             nav_drawer.set_state("close")
                             if screen_manager.current != "about": \
                             screen_manager.current = "about";
+                            screen_manager.transition.direction = "right"
                             nav_drawer.set_state("close")
                     OneLineListItem:
                         text: "Developer options"
                         on_press:
                             if screen_manager.current != "dev": \
                             screen_manager.current = "dev";
+                            screen_manager.transition.direction = "left"
                             nav_drawer.set_state("close")
 
+<LoadingScreen>:
+    name:"loading"
+    BoxLayout:
+        orientation:"vertical"
 
 <HomeScreen>:
     name: "home"
