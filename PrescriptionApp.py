@@ -31,12 +31,17 @@ class WindowManager(ScreenManager):
 
 class MyApp(MDApp):
     def build(self):
+        global screen_manager
         screen_manager = ScreenManager()
-        screen_manager.add_widget(Builder.load_file("style.kv"))
         screen_manager.add_widget(Builder.load_file("loading.kv"))
+        screen_manager.add_widget(Builder.load_file("style.kv"))
         return screen_manager
 
+    def on_start(self):
+        Clock.schedule_once(self.load_screen,5)
 
+    def load_screen(self,*args):
+        screen_manager.current = "main_screen"
 
 if __name__ == "__main__":
     MyApp().run()
