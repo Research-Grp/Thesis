@@ -47,13 +47,12 @@ Screen:
         orientation: "vertical"
         Screen:
             MDCard:
-#                text: "Drag here"
                 halign: "center"
                 size_hint: 0.6, 0.6
-#                size: "300dp", "500dp"
                 pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
                 MDLabel:
+                    id: card_text
                     text: "Choose a file or drag here"
                     font_style: "H5"
                     halign: "center"
