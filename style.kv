@@ -8,7 +8,6 @@ Screen:
     MDNavigationLayout:
         WindowManager:
             id:screen_manager
-            LoadingScreen:
             HomeScreen:
             AboutScreen:
             DeveloperScreen:
@@ -41,12 +40,6 @@ Screen:
                             screen_manager.current = "dev";
                             screen_manager.transition.direction = "left"
                             nav_drawer.set_state("close")
-
-<LoadingScreen>:
-    name:"loading"
-    BoxLayout:
-        orientation:"vertical"
-
 <HomeScreen>:
     name: "home"
     BoxLayout:

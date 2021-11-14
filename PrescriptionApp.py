@@ -8,6 +8,11 @@ from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import DragBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.clock import Clock
+
+
+class ToolBar(MDScreen):
+    pass
 
 class LoadingScreen(MDScreen):
     pass
@@ -19,22 +24,17 @@ class DeveloperScreen(MDScreen):
     pass
 
 class WindowManager(ScreenManager):
-    screen_manager = ObjectProperty(None)
-
-
-class DragLabel(DragBehavior, Label):
-    pass
+    screen_manager = ObjectProperty()
 
 
 class MyApp(MDApp):
     def build(self):
-        Window.bind(on_dropfile=self._on_file_drop)
-        self.root_widget = Builder.load_file("style.kv")
-        return self.root_widget
+        screen_manager = ScreenManager()
+        screen_manager.add_widget(Builder.load_file("style.kv"))
+        screen_manager.add_widget(Builder.load_file("loading.kv"))
+        return screen_manager
 
-    def _on_file_drop(self, window, file_path):
-        print(file_path)
-        return
+
 
 if __name__ == "__main__":
     MyApp().run()
