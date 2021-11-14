@@ -10,10 +10,6 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.clock import Clock
 
-
-class ToolBar(MDScreen):
-    pass
-
 class LoadingScreen(MDScreen):
     pass
 class HomeScreen(MDScreen):
