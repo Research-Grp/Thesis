@@ -42,11 +42,43 @@ Screen:
                             nav_drawer.set_state("close")
 <HomeScreen>:
     name: "home"
-    BoxLayout:
+    FloatLayout:
         orientation: "vertical"
-        MDLabel:
-            text: "Welcome to the Home Screen!"
-            halign: "center"
+        Screen:
+            MDCard:
+#                text: "Drag here"
+                halign: "center"
+                size_hint: 0.6, 0.6
+#                size: "300dp", "500dp"
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                MDLabel:
+                    text: "Choose a file or drag here"
+                    font_style: "H5"
+                    halign: "center"
+                    pos_hint: {"center_y": 0.5}
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+        MDFillRoundFlatButton:
+            markup: True
+            text: "[b]PROCESS[/b]"
+            font_size: 22
+            md_bg_color: 0.30, 0.62, 0.41, 1
+            size_hint: 0.18, 0.08
+            pos_hint: {"center_x": 0.35, "center_y": 0.1}
+            padding: 10
+
+        MDFillRoundFlatButton:
+            markup: True
+            text: "[b]CANCEL[/b]"
+            font_size: 22
+            md_bg_color: 0.65, 0.20, 0, 1
+            size_hint: 0.18, 0.08
+            pos_hint: {"center_x": 0.65, "center_y": 0.1}
+
+
 <AboutScreen>:
     name: "about"
     BoxLayout:

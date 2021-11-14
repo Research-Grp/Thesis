@@ -12,10 +12,20 @@ from kivy.clock import Clock
 
 class LoadingScreen(MDScreen):
     pass
+
+
 class HomeScreen(MDScreen):
-    pass
+    def _on_file_drop(self, window, file_path):
+        print(file_path)
+        self.filePath = file_path.decode("utf-8")  # convert byte to string
+        self.ids.img.source = self.filePath
+        self.ids.img.reload()  # reload image
+
+
 class AboutScreen(MDScreen):
     pass
+
+
 class DeveloperScreen(MDScreen):
     pass
 
