@@ -1,0 +1,110 @@
+Screen:
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "My application"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("toggle")]]
+    MDNavigationLayout:
+        WindowManager:
+            id:screen_manager
+            HomeScreen:
+            AboutScreen:
+            DeveloperScreen:
+    MDNavigationDrawer:
+        id: nav_drawer
+        BoxLayout:
+            orientation: "vertical"
+            ScrollView:
+                MDList:
+                    OneLineListItem:
+                        text:"Home"
+                        on_press:
+                            nav_drawer.set_state("close")
+                            if screen_manager.current != "home": \
+                            screen_manager.current = "home" ;
+                            screen_manager.transition.direction = "right"
+                            nav_drawer.set_state("close")
+                    OneLineListItem:
+                        text: "About"
+                        on_press:
+                            nav_drawer.set_state("close")
+                            if screen_manager.current != "about": \
+                            screen_manager.current = "about";
+                            screen_manager.transition.direction = "right"
+                            nav_drawer.set_state("close")
+                    OneLineListItem:
+                        text: "Developer options"
+                        on_press:
+                            if screen_manager.current != "dev": \
+                            screen_manager.current = "dev";
+                            screen_manager.transition.direction = "left"
+                            nav_drawer.set_state("close")
+<HomeScreen>:
+    name: "home"
+    MDBoxLayout:
+        orientation: "vertical"
+        Screen:
+            MDCard:
+                orientation: "vertical"
+                padding: "8dp"
+                size_hint: 0.6, 0.6
+#               size: "300dp", "500dp"
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                MDLabel:
+                    text: "Original Image"
+                    font_style: "H6"
+                    pos_hint: {"center_y": 0.5}
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDSeparator:
+                    height: "2dp"
+
+                MDLabel:
+                    text: "Insert Orig Pic Here "
+
+            MDCard:
+                orientation: "vertical"
+                padding: "8dp"
+                size_hint: 0.6, 0.6
+#                size: "300dp", "500dp"
+                pos_hint: {"center_x": 0.5, "bottom": 0.5}
+
+                MDLabel:
+                    text: "Translation"
+                    font_style: "H6"
+                    pos_hint: {"center_y": 0.5}
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDSeparator:
+                    height: "2dp"
+
+                MDLabel:
+                    text: "Insert Processed Pic Here"
+            ScrollView:
+                do_scroll_x: False
+                BoxLayout:
+                    id: result
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+
+<AboutScreen>:
+    name: "about"
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Welcome to the About Screen!"
+            halign: "center"
+<DeveloperScreen>:
+    name: "dev"
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Welcome to the Developer Screen!"
+            halign: "center"
