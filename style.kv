@@ -12,6 +12,7 @@ Screen:
             HomeScreen:
             AboutScreen:
             DeveloperScreen:
+            ProceedScreen:
     MDNavigationDrawer:
         id: nav_drawer
         BoxLayout:
@@ -69,6 +70,9 @@ Screen:
             size_hint: 0.18, 0.08
             pos_hint: {"center_x": 0.35, "center_y": 0.1}
             padding: 10
+            on_release:
+                root.manager.current = "proceed"
+                root.manager.transition.direction = "up"
 
         MDFillRoundFlatButton:
             markup: True
@@ -77,6 +81,17 @@ Screen:
             md_bg_color: 0.65, 0.20, 0, 1
             size_hint: 0.18, 0.08
             pos_hint: {"center_x": 0.65, "center_y": 0.1}
+
+<ProceedScreen>:
+    name:"proceed"
+    ScrollView:
+        pos_hint: {'top': 1.0 - root.manager.parent.parent.ids.toolbar.height/root.height }
+        #root.manager.parent.parent.ids.toolbar.height/root.manager.parent.parent.parent.height
+        do_scroll_x: False
+        MDGridLayout:
+            cols: 1
+            adaptive_height: True
+            MDCard:
 
 
 <AboutScreen>:
