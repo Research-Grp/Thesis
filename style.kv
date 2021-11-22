@@ -92,12 +92,12 @@ Screen:
         do_scroll_x: False
         MDList:
             id: card_list
+            padding: "50dp"
             RelativeLayout:
                 size_hint_y: None
                 MDCard:
                     id: upper_card
                     halign: "center"
-                    size_hint: 0.6, 1.0
                     pos_hint: {"center_x": 0.5, "center_y": 0.5}
                     MDGridLayout:
                         cols:1
@@ -113,11 +113,11 @@ Screen:
                             height: "2dp"
 
                         MDLabel:
-                            text: "Insert Orig Pic Here "
+                            text: str(root.ids)
+                            adaptive_height: True
                 MDCard:
                     id: lower_card
                     halign: "center"
-                    size_hint: 0.6, 1.0
                     pos_hint: {'center_x': 0.5, 'center_y': -0.7}
                     MDGridLayout:
                         cols:1
@@ -134,6 +134,9 @@ Screen:
 
                         MDLabel:
                             text: str(root.ids)
+                            adaptive_height: True
+
+
 
 
 

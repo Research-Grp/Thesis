@@ -10,11 +10,14 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.clock import Clock
 
+
 class LoadingScreen(MDScreen):
     pass
 
+
 class ProceedScreen(MDScreen):
     pass
+
 
 class HomeScreen(MDScreen):
     pass
@@ -26,6 +29,7 @@ class AboutScreen(MDScreen):
 
 class DeveloperScreen(MDScreen):
     pass
+
 
 class WindowManager(ScreenManager):
     screen_manager = ObjectProperty()
@@ -41,10 +45,11 @@ class MyApp(MDApp):
         return screen_manager
 
     def on_start(self):
-        Clock.schedule_once(self.load_screen,5)
+        Clock.schedule_once(self.load_screen, 5)
 
-    def load_screen(self,*args):
+    def load_screen(self, *args):
         screen_manager.current = "main_screen"
+
 
 if __name__ == "__main__":
     MyApp().run()
