@@ -13,6 +13,8 @@ from kivy.clock import Clock
 class LoadingScreen(MDScreen):
     pass
 
+class ProceedScreen(MDScreen):
+    pass
 
 class HomeScreen(MDScreen):
     pass
