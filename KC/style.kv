@@ -1,16 +1,18 @@
 Screen:
-    MDToolbar:
-        id: toolbar
-        pos_hint: {"top": 1}
-        elevation: 10
-        title: "My application"
-        left_action_items: [["menu", lambda x: nav_drawer.set_state("toggle")]]
-    MDNavigationLayout:
-        WindowManager:
-            id:screen_manager
-            HomeScreen:
-            AboutScreen:
-            DeveloperScreen:
+    BoxLayout:
+        orientation: "vertical"
+        MDToolbar:
+            id: toolbar
+            pos_hint: {"top": 1}
+            elevation: 10
+            title: "My application"
+            left_action_items: [["menu", lambda x: nav_drawer.set_state("toggle")]]
+        MDNavigationLayout:
+            WindowManager:
+                id:screen_manager
+                HomeScreen:
+                AboutScreen:
+                DeveloperScreen:
     MDNavigationDrawer:
         id: nav_drawer
         BoxLayout:
