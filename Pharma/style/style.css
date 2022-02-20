@@ -1,0 +1,238 @@
+/*html {
+    
+}
+*/
+
+
+/*
+* {
+    margin: 0;
+    padding: 0;
+}
+
+*/
+
+body {
+    font: normal .80em 'trebuchet ms', arial, sans-serif;
+    background: linear-gradient(to top, #000000 0%, #669999 107%);
+    height: 100%;
+    background-attachment: fixed;
+}
+
+a,
+a:hover {
+    outline: none;
+    text-decoration: underline;
+    color: #A4AA04;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+#main_logo {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 100px;
+    width: 350px;
+}
+
+#buttons {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#capture {
+    background-color: #03989e;
+    border: none;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 12px;
+    margin-right: 20px;
+}
+
+#capture:hover {
+    background-color: #056468;
+    color: white;
+}
+
+#upload {
+    background-color: #95c63e;
+    border: none;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 12px;
+    margin-left: 20px;
+}
+
+#upload:hover {
+    background-color: #71962e;
+    color: white;
+}
+
+#about {
+    margin-top: 50px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#about:hover {
+    background-color: #E7E7E7;
+    color: black;
+}
+
+#dev {
+    background: none;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#dev:hover {
+    background-color: #E7E7E7;
+    color: black;
+}
+
+.page {
+    margin: 1em auto;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+.box {
+    padding: 0.5em;
+    width: 100%;
+    margin: 0.5em;
+}
+
+.box-2 {
+    padding: 0.5em;
+    width: calc(100%/2 - 1em);
+}
+
+.options label,
+.options input {
+    width: 4em;
+    padding: 0.5em 1em;
+}
+
+.btn {
+    padding: 0.5em 1em;
+    text-decoration: none;
+    margin: 0.8em 0.3em;
+    cursor: pointer;
+}
+
+.hide {
+    display: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+#container1 {
+    height: 300px;
+    width: 350px;
+    border: 1px solid black;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    background-color: #eeeeee;
+    border-radius: 25px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.24);
+}
+
+#label1 {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    height: 20px;
+    width: 150px;
+    background-color: #95c63e;
+    border: 2px solid #71962e;
+    padding: 5px;
+    text-align: center;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+#container2 {
+    height: 300px;
+    width: 350px;
+    border: 1px solid black;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    background-color: #eeeeee;
+    border-radius: 25px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.24);
+}
+
+#label2 {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    height: 20px;
+    width: 150px;
+    background-color: #95c63e;
+    border: 2px solid #71962e;
+    padding: 5px;
+    text-align: center;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+#save {
+    text-align: center;
+}
+
+#download {
+    background-color: #95c63e;
+    border: none;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 12px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
+#download:hover {
+    background-color: #71962e;
+    color: white;
+}
