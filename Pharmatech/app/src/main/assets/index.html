@@ -12,7 +12,7 @@
     <div class="topnav" id="myTopnav">
         <a href="index.html" class="active">Home</a>
         <a href="about.html">About Us</a>
-        <a href="#">Developer Option</a>
+        <a href="instruction.html">Instruction</a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()">
             <i class="fa fa-bars"></i>
         </a>
@@ -23,7 +23,7 @@
                 <img src="pharma.png" alt="Logo" id="main_logo">
             </div>
             <div id="button">
-                <a class="btn" href="upload.html" id="upload"><i class="fa fa-upload"></i> Upload</a>
+                <button class="btn" id="upload" onclick="importData()"><i class="fa fa-upload"></i> Upload</a>
                 <div id="buttons2">
                     <a class="btn" id="instruction" href="instruction.html">Instruction</a>
                     <a class="btn" id="about" href="about.html">About Us</a>
@@ -48,6 +48,19 @@
         function() {
             window.history.back()
         }, true);
+</script>
+<script type="text/javascript">
+    function importData() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = _ => {
+            // you can use this method to get file and perform respective operations
+            let files = Array.from(input.files);
+            console.log(files);
+        };
+        input.click();
+    }
 </script>
 
 </html>

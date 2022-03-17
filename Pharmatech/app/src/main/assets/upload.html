@@ -1,21 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="A photo editing application based on the Cropper.js">
-    <meta name="author" content="Chen Fengyuan">
-    <title>Upload Image</title>
-    <link rel="stylesheet" href="font-awesome.min.css">
+    <title>Pharmatech</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <script src="jquery.js"></script>
+    <script src="popper.js"></script>
+    <script src="bootstrap.min.js"></script>
 </head>
 
 <body>
-    <div id="app"></div>
-    <script src="google-analytics.js" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="main.js"></script>
+    <div class="topnav" id="myTopnav">
+        <a>Upload</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+    <div id="mainUpload">
+        <h3 id="uploadtext">Select Image. Click <span><button type="button" data-toggle="modal" data-target="#cropModal" id="modalButton">here...</button></span></h3>
+    </div>
+
+    <!--Modal-->
+    <div class="modal fade" id="cropModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
+<script>
+    function myFunction() {
+        var x = document.getElementById("myTopnav");
+        if (x.className === "topnav") {
+            x.className += " responsive";
+        } else {
+            x.className = "topnav";
+        }
+    }
+</script>
+<script>
+    document.addEventListener(
+        "backbutton",
+        function() {
+            window.history.back()
+        }, true);
+</script>
 
 </html>
