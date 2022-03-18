@@ -1,49 +1,49 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Pharmatech</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="style.css" title="style" />
-    <link rel="stylesheet" type="text/css" href="font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
-    <script src="jquery.js"></script>
-    <script src="popper.js"></script>
-    <script src="bootstrap.min.js"></script>
+    <title>Editor</title>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="cropper.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="jquerySlim.js"></script>
+    <script src="bootstrapBundle.js"></script>
+    <script src="cropper.min.js"></script>
 </head>
 
 <body>
     <div class="topnav" id="myTopnav">
         <a>Upload</a>
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <i class="fa fa-bars"></i>
-        </a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
     <div id="mainUpload">
-        <h3 id="uploadtext">Select Image. Click <span><button type="button" data-toggle="modal" data-target="#cropModal" id="modalButton">here...</button></span></h3>
+        <input type="file" id="input" name="image" accept="image/*">
     </div>
 
-    <!--Modal-->
-    <div class="modal fade" id="cropModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+    <!-- Modal -->
+    <div class="container">
+        <div class="modal fade" id="modal" data-backdrop="static" tabindex="-1" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Cropper</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="img-container">
+                            <img id="image" alt="Picture">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="crop" class="btn btn-primary" data-dismiss="modal">Crop</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 <script>
     function myFunction() {
@@ -61,6 +61,51 @@
         function() {
             window.history.back()
         }, true);
+</script>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        var image = document.getElementById('image');
+        var cropBoxData;
+        var canvasData;
+        var cropper;
+
+        $('#modal').on('shown.bs.modal', function() {
+            cropper = new Cropper(image, {
+                autoCropArea: 0.7,
+                viewMode: 1,
+                center: true,
+                dragMode: 'move',
+                movable: true,
+                scalable: true,
+                guides: true,
+                zoomOnWheel: true,
+                cropBoxMovable: true,
+                wheelZoomRatio: 0.1,
+                ready: function() {
+                    cropper.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+                }
+            });
+
+
+        }).on('hidden.bs.modal', function() {
+            cropBoxData = cropper.getCropBoxData();
+            canvasData = cropper.getCanvasData();
+            var croppedImageDataURL = canvas.cropper('getCroppedCanvas').toDataURL("image/png");
+            cropper.destroy();
+        });
+    });
+</script>
+<script>
+    $("#input").on("change", function(e) {
+        var _URL = window.URL || window.webkitURL,
+            file = this.files[0],
+            image = new Image();
+        $('#image').attr('src', _URL.createObjectURL(file));
+        $(image).ready(function($) {
+            $('#modal').modal('show');
+        });
+        window.URL.revokeObjectURL(image.src);
+    });
 </script>
 
 </html>
