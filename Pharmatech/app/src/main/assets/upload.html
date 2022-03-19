@@ -90,7 +90,6 @@
         }).on('hidden.bs.modal', function() {
             cropBoxData = cropper.getCropBoxData();
             canvasData = cropper.getCanvasData();
-            var croppedImageDataURL = canvas.cropper('getCroppedCanvas').toDataURL("image/png");
             cropper.destroy();
         });
     });
