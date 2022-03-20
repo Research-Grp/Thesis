@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Pharmatech</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" title="style" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome.min.css') }}" />
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+        <a href="{{url_for('index')}}" class="active">Home</a>
+        <a href="{{url_for('about')}}">About Us</a>
+        <a href="{{url_for('instruction')}}">Instruction</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+    <div id="main">
+        <div id="header">
+            <div id="logo">
+                <img src="{{ url_for('static', filename='pharma.png') }}" alt="Logo" id="main_logo">
+            </div>
+            <div id="button">
+                <a class="btn" id="upload" href="{{url_for('upload')}}"><i class="fa fa-upload"></i> Upload</a>
+            </div>
+            <div id="buttons2">
+                <a class="btn" id="instruction" href="{{url_for('instruction')}}">Instruction</a>
+                <a class="btn" id="about" href="{{url_for('about')}}">About Us</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+    </script>
+</body>
+<script>
+    document.addEventListener(
+        "backbutton",
+        function() {
+            window.history.back()
+        }, true);
+
+    let files= []
+    function upload(){
+        $('input.image').click();
+    }
+
+</script>
+
+</html>

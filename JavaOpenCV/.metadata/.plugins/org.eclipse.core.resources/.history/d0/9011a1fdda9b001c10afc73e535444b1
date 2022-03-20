@@ -1,0 +1,32 @@
+package ggbois;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+
+public class MainCV {
+	public static void main(String args[]) throws Exception { 
+	      System.loadLibrary( Core.NATIVE_LIBRARY_NAME ); 
+	      String f = "C:\\Users\\Mendrix\\Downloads\\editing_images\\23\\1101.png"; 
+	      Mat img = Imgcodecs.imread(f); 
+	      MatOfByte mat = new MatOfByte();       
+	      Imgcodecs.imencode(".png", img, mat); 
+	      byte[] byteArray = mat.toArray(); 
+	      InputStream in = new ByteArrayInputStream(byteArray); 
+	      BufferedImage buf = ImageIO.read(in); 
+	      JFrame fr = new JFrame(); 
+	      fr.getContentPane().add(new JLabel(new ImageIcon(buf))); 
+	      fr.pack(); 
+	      fr.setVisible(true);
+	      
+	      System.out.println("Image Loaded");     
+	   } 
+}

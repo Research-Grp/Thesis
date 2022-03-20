@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("http://192.168.1.5:5000/");
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setOnKeyListener(new View.OnKeyListener() {

@@ -1,0 +1,7 @@
+package ggbois;
+
+public class MainCV {
+	public static void main(String args[]) {
+		System.out.println("hello WOrld");
+	}
+}
