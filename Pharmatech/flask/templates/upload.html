@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='cropper.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome.min.css') }}" />
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <script src="{{url_for('static', filename='jquerySlim.js')}}"></script>
     <script src="{{url_for('static', filename='bootstrapBundle.js')}}"></script>
@@ -20,8 +21,11 @@
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
     <div id="mainUpload">
-        <img class="rounded" id="avatar">
-        <input type="file" id="input" name="image" accept="image/*">
+        <form action="upload.html" method="post">
+            <img class="rounded" id="preview">
+            <input type="file" id="input" name="image" accept="image/*">
+            <button id="process"><i class="fa fa-refresh"></i> Process</button>
+        </form>
     </div>
 
     <!--MODAL-->
@@ -50,14 +54,14 @@
 </body>
 
 <script>
-   function myFunction() {
+    function myFunction() {
         var x = document.getElementById("myTopnav");
         if (x.className === "topnav") {
             x.className += " responsive";
         } else {
             x.className = "topnav";
         }
-   }
+    }
 </script>
 <script>
     document.addEventListener(
@@ -110,18 +114,19 @@
         });
 
         document.getElementById('crop').addEventListener('click', function() {
-            var initialAvatarURL;
+            var initialPreviewURL;
             var canvas;
 
             $modal.modal('hide');
 
             if (cropper) {
                 canvas = cropper.getCroppedCanvas({
-                    width: 160,
-                    height: 160,
+                    width: 300,
+                    height: 300,
                 });
-                initialAvatarURL = avatar.src;
-                avatar.src = canvas.toDataURL();
+                initialPreviewURL = preview.src;
+                preview.src = canvas.toDataURL();
+                process.style.visibility = "visible";
             }
         });
     });

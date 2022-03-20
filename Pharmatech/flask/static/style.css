@@ -1,5 +1,5 @@
 body {
-    font: normal .80em 'trebuchet ms', arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #022135;
     height: 100%;
     background-attachment: fixed;
@@ -133,6 +133,12 @@ img {
 
 /*upload.html*/
 
+form {
+    text-align: center;
+    width: 250px;
+    margin-top: 100px;
+}
+
 #mainUpload {
     position: fixed;
     top: 50%;
@@ -141,23 +147,38 @@ img {
     transform: translate(-50%, -50%);
 }
 
+#preview {
+    display: block;
+}
+
 #input {
     color: #f2f2f2;
-    background-color: #71962e;
     margin-top: 20px;
-}
-
-.progress {
-    display: none;
-    margin-bottom: 1rem;
-}
-
-.alert {
-    display: none;
+    font-size: 20px;
+    display: block;
+    margin-bottom: 100px;
 }
 
 .img-container img {
     max-width: 100%;
+}
+
+#process {
+    visibility: hidden;
+    padding: 10px 20px;
+    font-size: 25px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    background-color: #95c63e;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0px 5px 5px rgb(0, 0, 0);
+    display: block;
+    margin-left: 48px;
+    margin-bottom: 50px;
 }
 
 
