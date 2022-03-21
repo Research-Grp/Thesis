@@ -106,10 +106,17 @@
 
         $modal.on('shown.bs.modal', function() {
             cropper = new Cropper(image, {
-                autoCropArea: 0.7,
                 viewMode: 1,
                 center: true,
+                responsive: true,
+                autoCrop: true,
+                movable: false,
+                rotatable: false,
+                scalable: false,
+                scalableOnTouch: false,
+                zoomOnWheel: false,
             });
+
         }).on('hidden.bs.modal', function() {
             cropper.destroy();
             cropper = null;
@@ -125,9 +132,14 @@
                 canvas = cropper.getCroppedCanvas({
                     width: 300,
                     height: 300,
+                    maxWidth: 4096,
+                    maxHeight: 4096,
+                    fillColor: '#fff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
                 });
                 initialPreviewURL = preview.src;
-                preview.src = canvas.toDataURL();
+                preview.src = canvas.toDataURL('image/jpeg', 1);
                 base64 = preview.src;
                 console.log(base64);
                 process.style.visibility = "visible";
