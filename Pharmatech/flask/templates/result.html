@@ -10,29 +10,28 @@
 
 <body>
     <div class="topnav" id="myTopnav">
-        <a href="#"></a>
-        <a href="{{url_for('index')}}">Home</a>
-        <a href="{{url_for('about')}}">About Us</a>
-        <a href="#">Developer Option</a>
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <i class="fa fa-bars"></i>
-        </a>
+        <a>Result</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
-    <div id="container1">
+    <div id="resultContainer">
+        <div class="card">
+            <img src="{{ url_for('static', filename='1.jpg') }}" id="medipic" style="width:100%">
+            <div class="containerResults">
+                <h4><b>Prediction:</b></h4>
+                <p>FeSO4</p>
+            </div>
+        </div>
     </div>
-    <div id="save">
-        <button class="btn" id="download"><i class="fa fa-download"></i> Download</button>
-    </div>
-    <script>
-        function myFunction() {
-            var x = document.getElementById("myTopnav");
-            if (x.className === "topnav") {
-                x.className += " responsive";
-            } else {
-                x.className = "topnav";
-            }
-        }
-    </script>
 </body>
+<script>
+    function myFunction() {
+        var x = document.getElementById("myTopnav");
+        if (x.className === "topnav") {
+            x.className += " responsive";
+        } else {
+            x.className = "topnav";
+        }
+    }
+</script>
 
 </html>

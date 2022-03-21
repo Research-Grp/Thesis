@@ -21,8 +21,8 @@
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
     <div id="mainUpload">
-        <div>
-<!-- nilagyan ko muna div kay di ko na ginamit ang form-->
+        <div id="form">
+            <!-- nilagyan ko muna div kay di ko na ginamit ang form-->
             <img class="rounded" id="preview">
             <input type="file" id="input" name="image" accept="image/*">
             <button id="process" onclick="uploadPhoto()"><i class="fa fa-refresh"></i> Process</button>
@@ -135,18 +135,16 @@
         });
     });
 
-    function uploadPhoto(){
+    function uploadPhoto() {
         $.ajax({
             url: "{{url_for('upload')}}",
             type: 'POST',
             data: base64,
-            success: function(response){
+            success: function(response) {
                 window.location = "{{url_for('result')}}";
             }
         });
     }
-
-
 </script>
 
 </html>
