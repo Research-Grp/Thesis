@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='cropper.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome.min.css') }}" />
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
-    <script src="{{url_for('static', filename='jquerySlim.js')}}"></script>
+    <script src="{{url_for('static', filename='jquery.min.js')}}"></script>
     <script src="{{url_for('static', filename='bootstrapBundle.js')}}"></script>
     <script src="{{url_for('static', filename='cropper.min.js')}}"></script>
 </head>
@@ -21,11 +21,12 @@
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
     <div id="mainUpload">
-        <form action="upload.html" method="post">
+        <div>
+<!-- nilagyan ko muna div kay di ko na ginamit ang form-->
             <img class="rounded" id="preview">
             <input type="file" id="input" name="image" accept="image/*">
-            <button id="process"><i class="fa fa-refresh"></i> Process</button>
-        </form>
+            <button id="process" onclick="uploadPhoto()"><i class="fa fa-refresh"></i> Process</button>
+        </div>
     </div>
 
     <!--MODAL-->
@@ -71,6 +72,7 @@
         }, true);
 </script>
 <script>
+    var base64;
     window.addEventListener('DOMContentLoaded', function() {
         var image = document.getElementById('image');
         var $modal = $('#modal');
@@ -126,10 +128,25 @@
                 });
                 initialPreviewURL = preview.src;
                 preview.src = canvas.toDataURL();
+                base64 = preview.src;
+                console.log(base64);
                 process.style.visibility = "visible";
             }
         });
     });
+
+    function uploadPhoto(){
+        $.ajax({
+            url: "{{url_for('upload')}}",
+            type: 'POST',
+            data: base64,
+            success: function(response){
+                window.location = "{{url_for('result')}}";
+            }
+        });
+    }
+
+
 </script>
 
 </html>
