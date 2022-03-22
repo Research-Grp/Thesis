@@ -23,7 +23,7 @@
     <div id="mainUpload">
         <div>
 <!-- nilagyan ko muna div kay di ko na ginamit ang form-->
-            <img class="rounded" id="preview">
+            <img class="rounded" id="preview" height="300" width="300">
             <input type="file" id="input" name="image" accept="image/*">
             <button id="process" onclick="uploadPhoto()"><i class="fa fa-refresh"></i> Process</button>
         </div>
@@ -123,13 +123,11 @@
 
             if (cropper) {
                 canvas = cropper.getCroppedCanvas({
-                    width: 300,
-                    height: 300,
+
                 });
                 initialPreviewURL = preview.src;
-                preview.src = canvas.toDataURL();
+                preview.src = canvas.toDataURL("image/png",1);
                 base64 = preview.src;
-                console.log(base64);
                 process.style.visibility = "visible";
             }
         });
@@ -141,7 +139,7 @@
             type: 'POST',
             data: base64,
             success: function(response){
-                window.location = "{{url_for('result')}}";
+               window.location = "{{url_for('result')}}";
             }
         });
     }
