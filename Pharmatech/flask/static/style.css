@@ -133,7 +133,7 @@ img {
 
 /*upload.html*/
 
-form {
+#form {
     text-align: center;
     width: 250px;
     margin-top: 100px;
@@ -165,7 +165,7 @@ form {
 
 #process {
     visibility: hidden;
-    padding: 10px 20px;
+    padding: 5px 15px;
     font-size: 25px;
     text-align: center;
     cursor: pointer;
@@ -184,33 +184,34 @@ form {
 
 /*result.html*/
 
-#container1 {
-    height: auto;
-    width: auto;
-    border: 1px solid black;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
+.card {
+    box-shadow: 0px 5px 5px rgb(0, 0, 0);
+    width: 90%;
+    border-radius: 5px;
+    background-color: white;
     margin-top: 50px;
-    border-radius: 25px;
-    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.24);
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 50px;
 }
 
-#label1 {
-    position: absolute;
-    top: -10px;
-    left: 20px;
-    height: 20px;
-    width: 150px;
-    background-color: #95c63e;
-    border: 2px solid #71962e;
-    padding: 5px;
-    text-align: center;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 10px;
+.card2 {
+    box-shadow: 0px 5px 5px rgb(0, 0, 0);
+    width: 90%;
+    border-radius: 5px;
+    background-color: white;
+    margin-top: 50px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 50px;
+}
+
+#medipic {
+    border-radius: 5px 5px 0 0;
+}
+
+.containerResults {
+    padding: 2px 16px;
 }
 
 #save {
