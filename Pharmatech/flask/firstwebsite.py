@@ -8,11 +8,15 @@ from io import BytesIO
 import random
 import string
 
+import joblib
+from sklearn import svm
 import tensorflow as tf
 import asrtoolkit as ak
 from tensorflow.keras.layers import Input
 from tensorflow import keras
 from tensorflow.keras.layers.experimental.preprocessing import StringLookup
+from sklearnex import patch_sklearn
+patch_sklearn()
 
 
 def get_random_string(length):
@@ -27,11 +31,13 @@ new_model = keras.models.load_model('static/model09')
 predict_model = keras.models.Model(
     new_model.get_layer(name="image").input, new_model.get_layer(name="dense2").output
 )
+svm_model = joblib.load('static/svm/model04.pkl')
 
 path_to_cropped = "static/cropped_img/"
 path_to_segmented_img = "static/segmented_img/"
 app.secret_key = get_random_string(20)
 
+Categories = ['printed', 'handwritten']
 padding_token = 99
 image_width = 360
 image_height = 60
@@ -64,7 +70,7 @@ def decode_batch_predictions(pred):
     return output_text
 
 
-def distortion_free_resize(image, img_size):
+def distortion_free_resize(image, img_size,to_rgb=True):
     w, h = img_size
     image = tf.image.resize(image, size=(h, w), preserve_aspect_ratio=True)
 
@@ -95,18 +101,19 @@ def distortion_free_resize(image, img_size):
             [0, 0],
         ],
     )
-
-    image = tf.image.grayscale_to_rgb(image)
+    if to_rgb:
+        image = tf.image.grayscale_to_rgb(image)
     image = tf.transpose(image, perm=[1, 0, 2])
     image = tf.image.flip_left_right(image)
     return image
 
-def preprocess_image(image_path, img_size=(image_width, image_height)):
+def preprocess_image(image_path, img_size=(image_width, image_height),delete=True,to_rgb=True):
     image = tf.io.read_file(image_path)
     #remove image after upload
-    os.remove(image_path)
+    if delete:
+        os.remove(image_path)
     image = tf.image.decode_png(image, 1)
-    image = distortion_free_resize(image, img_size)
+    image = distortion_free_resize(image, img_size,to_rgb=to_rgb)
     image = tf.cast(image, tf.float32) / 255.0
     return image
 
@@ -174,7 +181,7 @@ def result():
                     #segmented image to be predicted
                     roi = img[y:y + h, x:x + w]
                     #append to image_list for image showing in html
-                    image_list.append(roi)
+                    # image_list.append(roi)
 
                     #save image and delete
                     path_i = path_to_segmented_img + str(count) + str(
@@ -182,13 +189,17 @@ def result():
                     cv.imwrite(path_i,roi)
 
                     #make image tf image
-                    image = preprocess_image(path_i)
+                    image = preprocess_image(path_i,delete=False)
+                    image_svm = preprocess_image(path_i,img_size=(100,50)
+                                                ,to_rgb=False)
+                    image_svm = [tf.reshape(image_svm,[-1])]
                     image_expanded = tf.expand_dims(image, 0)
 
                     #predict image
+                    svm_pred = Categories[svm_model.predict(image_svm)[0]]
                     pred = predict_model.predict(image_expanded)
                     pred_text = decode_batch_predictions(pred)
-                    print("prediction:"+ str(count+1) ,pred_text)
+                    print("prediction:"+ str(count+1) ,pred_text, svm_pred)
                     count += 1
 
             for contour in contours:
@@ -203,13 +214,18 @@ def result():
             path_i = path_to_segmented_img + str(
                 session["crop"])
             cv.imwrite(path_i,img)
-            image = preprocess_image(path_i)
+            image = preprocess_image(path_i,delete=False)
+            image_svm = preprocess_image(path_i, img_size=(100, 50),
+                                         to_rgb=False)
+            image_svm = [tf.reshape(image_svm, [-1])]
             image_expanded = tf.expand_dims(image, 0)
 
             # predict image
+            svm_pred = Categories[svm_model.predict(image_svm)[0]]
             pred = predict_model.predict(image_expanded)
             pred_text = decode_batch_predictions(pred)
-            print("prediction:", pred_text)
+
+            print("prediction:", pred_text,svm_pred)
 
     else:
         return redirect(url_for('upload'))
