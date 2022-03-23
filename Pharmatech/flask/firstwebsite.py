@@ -147,15 +147,20 @@ def about():
 def result():
 
     if "crop" in session:
-        image_list = []#prediction storage
-        image_predict = []#
+        image_list = []#image storage to be shown in html
+        word_cnn_predict = []
+        word_svm_predict = []
+        contoured_img = None
         path_c = path_to_cropped+str(session["crop"])
 
         img = cv.imread(path_c)
-        # im = Image.open(path_to_cropped+str(session["crop"]))
-        os.remove(path_c)
+        if img.size != 0:
+            os.remove(path_c)
+            gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        else:
+            session.pop("crop")
+            return redirect(url_for('upload'))
 
-        gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         img_h = img.shape[0]
         img_w = img.shape[1]
         print("shape[0]h = ",img_h," shape[1]w = ",img_w)#tester
@@ -180,8 +185,13 @@ def result():
                 if (cv.contourArea(contour) > 4000 and h > 50):
                     #segmented image to be predicted
                     roi = img[y:y + h, x:x + w]
+
                     #append to image_list for image showing in html
-                    # image_list.append(roi)
+                    #convert image to png before converting to base64
+                    _, roi_buffered = cv.imencode('.png', roi)
+                    roi_img = base64.b64encode(roi_buffered).decode("utf-8")
+                    roi_img = "data:image/png;base64, " + roi_img
+                    image_list.append(roi_img)
 
                     #save image and delete
                     path_i = path_to_segmented_img + str(count) + str(
@@ -196,17 +206,27 @@ def result():
                     image_expanded = tf.expand_dims(image, 0)
 
                     #predict image
-                    svm_pred = Categories[svm_model.predict(image_svm)[0]]
+                    svm_pred = Categories[svm_model.predict(image_svm)[0]]#svm prediction
                     pred = predict_model.predict(image_expanded)
-                    pred_text = decode_batch_predictions(pred)
-                    print("prediction:"+ str(count+1) ,pred_text, svm_pred)
+                    pred_text = decode_batch_predictions(pred)#crnn prediction
+                    print("prediction:"+ str(count+1) ,pred_text, svm_pred)#tester
+                    #send predictions to html
+                    word_cnn_predict.append(pred_text)
+                    word_svm_predict.append(svm_pred)
                     count += 1
 
             for contour in contours:
                 x, y, w, h = cv.boundingRect(contour)
                 if (cv.contourArea(contour) > 4000 and h > 50):
                     cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            # cv.imwrite("static/segmented_img/contoured_img.png",img)
+
+            #convert image to png before converting to base64
+            #pass image to through jinja template
+            _, cont_buffered_img = cv.imencode('.png', img)
+            contoured_img = base64.b64encode(cont_buffered_img).decode("utf-8")
+            contoured_img = "data:image/png;base64, " + contoured_img
+            # print(contoured_img[:310],type(contoured_img)) #tester
+
         else: #else put inside processed_img folder
             print("false: smaller than 100,160")
 
@@ -220,18 +240,29 @@ def result():
             image_svm = [tf.reshape(image_svm, [-1])]
             image_expanded = tf.expand_dims(image, 0)
 
+            # convert image to png before converting to base64
+            # pass image to through jinja template
+            _, cont_buffered_img = cv.imencode('.png', img)
+            contoured_img = base64.b64encode(cont_buffered_img).decode("utf-8")
+            contoured_img = "data:image/png;base64, " + contoured_img
+
             # predict image
             svm_pred = Categories[svm_model.predict(image_svm)[0]]
             pred = predict_model.predict(image_expanded)
             pred_text = decode_batch_predictions(pred)
-
-            print("prediction:", pred_text,svm_pred)
+            print("prediction:", pred_text, svm_pred)  # tester
+            # send predictions to html
+            word_cnn_predict.append(pred_text)
+            word_svm_predict.append(svm_pred)
 
     else:
         return redirect(url_for('upload'))
 
 
-    return render_template("result.html")
+    return render_template("result.html",cont_img = contoured_img,
+                           cnn_predict= word_cnn_predict,
+                           svm_predict = word_svm_predict,
+                           images=image_list)
 
 @app.route('/upload.html',methods=['POST','GET'])
 def upload():

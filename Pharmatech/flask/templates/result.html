@@ -13,17 +13,23 @@
         <a>Result</a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
+
+
     <div id="resultContainer">
+        {% for x in cnn_predict: %}
         <div class="card">
-            <img src="{{ url_for('static', filename='1.jpg') }}" id="medipic" style="width:100%">
+            <img src="{{images[loop.index0]}}" id="medipic" width="200" height="200">
             <div class="containerResults">
                 <h4><b>Prediction:</b></h4>
-                <p>FeSO4</p>
+                <p>{{x}}</p><p>{{ svm_predict[loop.index0] }}</p>
             </div>
         </div>
+        {% endfor %}
+        {% if cont_img != None: %}
         <div class="card2">
-            <img src="{{ url_for('static', filename='1111.jpg') }}" id="medipic" style="width:100%">
+            <img src="{{cont_img}}" id="medipic" style="width:100%">
         </div>
+        {% endif%}
     </div>
 
 </body>
@@ -36,6 +42,7 @@
             x.className = "topnav";
         }
     }
+    console.log({{cont_img}}));
 </script>
 
 </html>
