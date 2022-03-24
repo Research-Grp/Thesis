@@ -22,10 +22,17 @@
             <div class="containerResults">
                 <h4><b>Prediction:</b></h4>
                 <p>{{x}}</p>
+                <hr>
+                <h4><b>Classification:</b></h4>
                 <p>{{ svm_predict[loop.index0] }}</p>
+                <hr>
+            <select id="suggest">
+                <option>Suggestions:</option>
                 {% for y in suggestions[loop.index0]:%}
-                <li>{{y}}</li>
-                {% endfor %}
+               <option disabled>{{y[1:]}}</option>
+               {% endfor %}
+            </select>
+
             </div>
         </div>
         {% endfor %}
@@ -46,7 +53,7 @@
             x.className = "topnav";
         }
     }
-    console.log({{cont_img}}));
+    console.log({{cont_img}});
 </script>
 
 </html>

@@ -210,6 +210,7 @@ img {
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 50px;
+    padding-bottom: 20px;
 }
 
 .card2 {
@@ -225,36 +226,20 @@ img {
 
 #medipic {
     border-radius: 5px 5px 0 0;
+    width: 100%;
 }
 
 .containerResults {
     padding: 2px 16px;
 }
-
-#save {
-    text-align: center;
+#suggest{
+    font-size: 15px;
+    font-weight: bold;
 }
 
-#download {
-    background-color: #95c63e;
-    border: none;
-    color: white;
-    padding: 10px 32px;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 12px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
-    box-shadow: 0px 5px 5px rgb(0, 0, 0);
+.hide {
+  display: none;
 }
-
-#download:hover {
-    background-color: #71962e;
-    color: white;
-}
-
 
 /*about.html*/
 
