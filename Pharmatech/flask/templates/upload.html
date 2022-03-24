@@ -16,6 +16,9 @@
 </head>
 
 <body>
+    <div id="loading" style="display:none">
+        <img id="loading-image" src="{{url_for('static', filename='load.gif')}}" style="display:none" alt="Loading..." />
+    </div>
     <div class="topnav" id="myTopnav">
         <a>Upload</a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
@@ -141,13 +144,19 @@
     });
 
     function uploadPhoto() {
+        $('#loading-image').show();
+        $('#loading').show();
         $.ajax({
             url: "{{url_for('upload')}}",
             type: 'POST',
             data: base64,
-            success: function(response){
-               window.location = "{{url_for('result')}}";
-
+            success: function(response) {
+                window.location = "{{url_for('result')}}";
+                $('#loading-image').bind('ajaxStart', function(){
+                    $(this).show();
+                }).bind('ajaxStop', function(){
+                    $(this).hide();
+                });
             }
         });
     }
