@@ -7,6 +7,7 @@ from PIL import Image
 from io import BytesIO
 import random
 import string
+import pandas as pd
 
 import joblib
 from sklearn import svm
@@ -33,6 +34,8 @@ predict_model = keras.models.Model(
 )
 svm_model = joblib.load('static/svm/model04.pkl')
 
+drugs = pd.read_csv("static/drugnames.csv", header=None)
+
 path_to_cropped = "static/cropped_img/"
 path_to_segmented_img = "static/segmented_img/"
 app.secret_key = get_random_string(20)
@@ -54,6 +57,71 @@ characters = ['m', 'd', 'l', 'f', 'P', '"', 'R', 'o', 'H', '8', 'W', 'n', 'N',
 char_to_num = StringLookup(vocabulary=list(characters), mask_token=None)
 num_to_char = StringLookup(
     vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
+
+def compare_func(drugname,prediction):
+    sum = 0
+    letters = set()
+    for char in drugname:
+        if char in prediction and char not in letters:
+            sum+=1
+        letters.add(char)
+    return sum
+
+def suggest(prediction):
+
+    suggestions = []
+    max_compare = 0
+    for x in drugs.iterrows():
+        drugname = str(x[1][0])
+        LVD = levenshteinDistanceDP(drugname, prediction.lower())
+        if LVD < 5:
+            if LVD == 1:
+                return prediction
+            compare = compare_func(drugname, prediction)
+            max_compare = max(compare, max_compare)
+            dict_ = str(int(LVD)) + drugname
+            suggestions.append(dict_)
+
+    # print(max_compare)
+    short_suggest = []
+    for drugname in suggestions:
+        compare = compare_func(drugname, prediction)
+        if compare > max_compare - 2:
+            short_suggest.append(drugname)
+
+    short_suggest.sort()
+    suggestions.sort()
+    return suggestions
+
+def levenshteinDistanceDP(token1, token2):
+    distances = np.zeros((len(token1) + 1, len(token2) + 1))
+
+    for t1 in range(len(token1) + 1):
+        distances[t1][0] = t1
+
+    for t2 in range(len(token2) + 1):
+        distances[0][t2] = t2
+
+    a = 0
+    b = 0
+    c = 0
+
+    for t1 in range(1, len(token1) + 1):
+        for t2 in range(1, len(token2) + 1):
+            if (token1[t1 - 1] == token2[t2 - 1]):
+                distances[t1][t2] = distances[t1 - 1][t2 - 1]
+            else:
+                a = distances[t1][t2 - 1]
+                b = distances[t1 - 1][t2]
+                c = distances[t1 - 1][t2 - 1]
+
+                if (a <= b and a <= c):
+                    distances[t1][t2] = a + 1
+                elif (b <= a and b <= c):
+                    distances[t1][t2] = b + 1
+                else:
+                    distances[t1][t2] = c + 1
+    return distances[len(token1)][len(token2)]
 
 def decode_batch_predictions(pred):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
@@ -149,15 +217,17 @@ def result():
     if "crop" in session:
         image_list = []#image storage to be shown in html
         word_cnn_predict = []
+        suggestion_list = []
         word_svm_predict = []
         contoured_img = None
         path_c = path_to_cropped+str(session["crop"])
 
         img = cv.imread(path_c)
-        if img.size != 0:
+
+        try:
             os.remove(path_c)
             gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        else:
+        except:
             session.pop("crop")
             return redirect(url_for('upload'))
 
@@ -166,7 +236,7 @@ def result():
         print("shape[0]h = ",img_h," shape[1]w = ",img_w)#tester
 
         if (img_h > 100 and img_w > 160): #if image height is greater than 100 pre-process
-            print("true")
+            print("true")#tester
             blurred_img = cv.GaussianBlur(gray_img, (7, 7), 0)
             ret, threshed_img = cv.threshold(blurred_img, 0, 255,
                                             cv.THRESH_BINARY + cv.THRESH_OTSU)
@@ -211,8 +281,9 @@ def result():
                     pred_text = decode_batch_predictions(pred)#crnn prediction
                     print("prediction:"+ str(count+1) ,pred_text, svm_pred)#tester
                     #send predictions to html
-                    word_cnn_predict.append(pred_text)
+                    word_cnn_predict.append(pred_text[0])
                     word_svm_predict.append(svm_pred)
+                    suggestion_list.append(suggest(pred_text[0]))
                     count += 1
 
             for contour in contours:
@@ -242,9 +313,10 @@ def result():
 
             # convert image to png before converting to base64
             # pass image to through jinja template
-            _, cont_buffered_img = cv.imencode('.png', img)
-            contoured_img = base64.b64encode(cont_buffered_img).decode("utf-8")
-            contoured_img = "data:image/png;base64, " + contoured_img
+            _, roi_buffered = cv.imencode('.png', img)
+            roi_img = base64.b64encode(roi_buffered).decode("utf-8")
+            roi_img = "data:image/png;base64, " + roi_img
+            image_list.append(roi_img)
 
             # predict image
             svm_pred = Categories[svm_model.predict(image_svm)[0]]
@@ -252,8 +324,9 @@ def result():
             pred_text = decode_batch_predictions(pred)
             print("prediction:", pred_text, svm_pred)  # tester
             # send predictions to html
-            word_cnn_predict.append(pred_text)
+            word_cnn_predict.append(pred_text[0])
             word_svm_predict.append(svm_pred)
+            suggestion_list.append(suggest(pred_text[0]))
 
     else:
         return redirect(url_for('upload'))
@@ -262,7 +335,8 @@ def result():
     return render_template("result.html",cont_img = contoured_img,
                            cnn_predict= word_cnn_predict,
                            svm_predict = word_svm_predict,
-                           images=image_list)
+                           images=image_list,
+                           suggestions=suggestion_list)
 
 @app.route('/upload.html',methods=['POST','GET'])
 def upload():
@@ -284,4 +358,5 @@ def instruction():
 
 
 if __name__ == "__main__":
+    app.jinja_env.globals.update(suggest_function=suggest)
     app.run(host="0.0.0.0",debug=True)

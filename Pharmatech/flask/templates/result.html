@@ -18,10 +18,14 @@
     <div id="resultContainer">
         {% for x in cnn_predict: %}
         <div class="card">
-            <img src="{{images[loop.index0]}}" id="medipic" width="200" height="200">
+            <img src="{{images[loop.index0]}}" id="medipic">
             <div class="containerResults">
                 <h4><b>Prediction:</b></h4>
-                <p>{{x}}</p><p>{{ svm_predict[loop.index0] }}</p>
+                <p>{{x}}</p>
+                <p>{{ svm_predict[loop.index0] }}</p>
+                {% for y in suggestions[loop.index0]:%}
+                <li>{{y}}</li>
+                {% endfor %}
             </div>
         </div>
         {% endfor %}
@@ -29,7 +33,7 @@
         <div class="card2">
             <img src="{{cont_img}}" id="medipic" style="width:100%">
         </div>
-        {% endif%}
+        {% endif %}
     </div>
 
 </body>
