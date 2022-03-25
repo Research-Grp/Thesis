@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}" title="style" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='font-awesome.min.css')}}" />
+    <script src="{{url_for('static', filename='jquery.min.js')}}"></script>
 </head>
 
 <body>
@@ -21,18 +22,21 @@
             <img src="{{images[loop.index0]}}" id="medipic">
             <div class="containerResults">
                 <h4><b>Prediction:</b></h4>
-                <p>{{x}}</p>
-                <hr>
+                    <p>{{x}}</p>
+                    <hr>
                 <h4><b>Classification:</b></h4>
-                <p>{{ svm_predict[loop.index0] }}</p>
-                <hr>
-            <select id="suggest">
-                <option>Suggestions:</option>
-                {% for y in suggestions[loop.index0]:%}
-               <option disabled>{{y[1:]}}</option>
-               {% endfor %}
-            </select>
-
+                    <p>{{ svm_predict[loop.index0] }}</p>
+                    <hr>
+                <h4><b>Suggestions:</b></h4>
+                    {% for y in suggestions[loop.index0][:5]:%}
+                        <li>{{y[1:]}}</li>
+                    {% endfor %}
+                <a class="read-more-show hide" href="#" id="1">Read More</a>
+                <span class="read-more-content">
+                    {% for y in suggestions[loop.index0][6:]:%}
+                        <li>{{y[1:]}}</li>
+                    {% endfor %}
+                    <a class="read-more-hide hide" href="#" more-id="1">Read Less</a></span>
             </div>
         </div>
         {% endfor %}
@@ -45,6 +49,13 @@
 
 </body>
 <script>
+    document.addEventListener(
+        "backbutton",
+        function() {
+            window.history.back()
+        }, true);
+</script>
+<script>
     function myFunction() {
         var x = document.getElementById("myTopnav");
         if (x.className === "topnav") {
@@ -54,6 +65,23 @@
         }
     }
     console.log({{cont_img}});
+</script>
+<script>
+    $('.read-more-content').addClass('hide')
+    $('.read-more-show, .read-more-hide').removeClass('hide')
+
+    $('.read-more-show').on('click', function(e) {
+      $(this).next('.read-more-content').removeClass('hide');
+      $(this).addClass('hide');
+      e.preventDefault();
+    });
+
+    $('.read-more-hide').on('click', function(e) {
+      $(this).parent('.read-more-content').addClass('hide');
+      var moreid=$(this).attr("more-id");
+      $('.read-more-show#'+moreid).removeClass('hide');
+      e.preventDefault();
+    });
 </script>
 
 </html>
