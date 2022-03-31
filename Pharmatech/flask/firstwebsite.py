@@ -8,6 +8,7 @@ from io import BytesIO
 import random
 import string
 import pandas as pd
+import time
 
 import joblib
 from sklearn import svm
@@ -28,7 +29,7 @@ def get_random_string(length):
 
 app = Flask(__name__)
 
-new_model = keras.models.load_model('static/model09')
+new_model = keras.models.load_model('static/crnn/model09')
 predict_model = keras.models.Model(
     new_model.get_layer(name="image").input, new_model.get_layer(name="dense2").output
 )
@@ -53,7 +54,13 @@ characters = ['m', 'd', 'l', 'f', 'P', '"', 'R', 'o', 'H', '8', 'W', 'n', 'N',
               'i', 'Z', 'S', '7', 'q', 'G', 'D', 'E', 'J', 'b', '4', ' ', '/',
               '+', 'L', 'k', ';', 't', 'e', 'a', 'g', 'K', '2', '0', 's', 'u',
               '_', 'C', '%']
-
+# characters = [' ', '!', '"', '#', '%', '&', "'", '(', ')', '*', '+', ',', '-',
+#               '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':',
+#               ';', '?', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+#               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+#               'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+#               'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+#               'y', 'z']
 char_to_num = StringLookup(vocabulary=list(characters), mask_token=None)
 num_to_char = StringLookup(
     vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
@@ -76,7 +83,7 @@ def suggest(prediction):
         LVD = levenshteinDistanceDP(drugname, prediction.lower())
         if LVD < 5:
             if LVD == 1:
-                return prediction
+                return [str(int(LVD))+prediction]
             compare = compare_func(drugname, prediction)
             max_compare = max(compare, max_compare)
             dict_ = str(int(LVD)) + drugname
@@ -235,6 +242,7 @@ def result():
         img_w = img.shape[1]
         print("shape[0]h = ",img_h," shape[1]w = ",img_w)#tester
 
+        start_time = time.time()
         if (img_h > 100 and img_w > 160): #if image height is greater than 100 pre-process
             print("true")#tester
             blurred_img = cv.GaussianBlur(gray_img, (7, 7), 0)
@@ -327,7 +335,9 @@ def result():
             word_cnn_predict.append(pred_text[0])
             word_svm_predict.append(svm_pred)
             suggestion_list.append(suggest(pred_text[0]))
-
+        print(suggestion_list)
+        end_time = time.time()
+        print(end_time - start_time,"s")
     else:
         return redirect(url_for('upload'))
 

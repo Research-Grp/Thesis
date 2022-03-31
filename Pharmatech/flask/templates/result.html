@@ -15,9 +15,15 @@
         <a href="javascript:void(0);" class="icon" onclick="myFunction()"></a>
     </div>
 
-
+{% set colors = ["","#28A129","#69B34C","#ACB334","#FAB733","#FF8E15","#FF4E11","#FF0D0D"] %}
+<!-- set green to red pos2"#2DB32E" -->
     <div id="resultContainer">
-        {% for x in cnn_predict: %}
+        {% if cont_img != None: %}
+        <div class="card2">
+            <img src="{{cont_img}}" id="medipic" style="width:100%">
+        </div>
+        {% endif %}
+        {% for x in cnn_predict %}
         <div class="card">
             <img src="{{images[loop.index0]}}" id="medipic">
             <div class="containerResults">
@@ -28,23 +34,25 @@
                     <p>{{ svm_predict[loop.index0] }}</p>
                     <hr>
                 <h4><b>Suggestions:</b></h4>
-                    {% for y in suggestions[loop.index0][:5]:%}
-                        <li>{{y[1:]}}</li>
+                {% if suggestions[loop.index0]|length < 6 %}
+                    {% for y in suggestions[loop.index0] %}
+                        <li style="color:{{ colors[y[0]|int] }};">{{y[1:]}}</li>
                     {% endfor %}
-                <a class="read-more-show hide" href="#" id="1">Read More</a>
-                <span class="read-more-content">
-                    {% for y in suggestions[loop.index0][6:]:%}
-                        <li>{{y[1:]}}</li>
+                {% else %}
+                    {% for y in suggestions[loop.index0][:5] %}
+                        <li style="color:{{ colors[y[0]|int] }};">{{y[1:]}}</li>
+                    {% endfor %}
+                    <a class="read-more-show hide" href="#" id="1">Read More</a>
+                    <span class="read-more-content">
+                    {% for y in suggestions[loop.index0][6:] %}
+                        <li style="color:{{ colors[y[0]|int] }};">{{y[1:]}}</li>
                     {% endfor %}
                     <a class="read-more-hide hide" href="#" more-id="1">Read Less</a></span>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
-        {% if cont_img != None: %}
-        <div class="card2">
-            <img src="{{cont_img}}" id="medipic" style="width:100%">
-        </div>
-        {% endif %}
+
     </div>
 
 </body>
@@ -77,10 +85,10 @@
     });
 
     $('.read-more-hide').on('click', function(e) {
+      e.preventDefault();
       $(this).parent('.read-more-content').addClass('hide');
       var moreid=$(this).attr("more-id");
       $('.read-more-show#'+moreid).removeClass('hide');
-      e.preventDefault();
     });
 </script>
 
