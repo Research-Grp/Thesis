@@ -9,7 +9,6 @@ import random
 import string
 import pandas as pd
 import time
-
 import joblib
 from sklearn import svm
 import tensorflow as tf
@@ -29,13 +28,13 @@ def get_random_string(length):
 
 app = Flask(__name__)
 
-new_model = keras.models.load_model('static/crnn/model09')
+new_model = keras.models.load_model('static/crnn/model22')
 predict_model = keras.models.Model(
     new_model.get_layer(name="image").input, new_model.get_layer(name="dense2").output
 )
-svm_model = joblib.load('static/svm/model04.pkl')
+svm_model = joblib.load('static/svm/model08.pkl')
 
-drugs = pd.read_csv("static/drugnames.csv", header=None)
+drugs = pd.read_csv("static/dictionary.csv", header=None)
 
 path_to_cropped = "static/cropped_img/"
 path_to_segmented_img = "static/segmented_img/"
@@ -47,20 +46,20 @@ image_width = 360
 image_height = 60
 max_len = 21
 AUTOTUNE = tf.data.AUTOTUNE
-characters = ['m', 'd', 'l', 'f', 'P', '"', 'R', 'o', 'H', '8', 'W', 'n', 'N',
-              'h', '*', 'I', 'y', '3', ',', 'X', '.', 'B', 'j', 'Q', ')', 'V',
-              'M', 'x', '1', 'c', ':', 'T', '?', '!', 'F', "'", '9', '#', 'z',
-              '6', '5', 'p', 'r', 'Y', '-', 'v', '&', 'O', 'U', '(', 'w', 'A',
-              'i', 'Z', 'S', '7', 'q', 'G', 'D', 'E', 'J', 'b', '4', ' ', '/',
-              '+', 'L', 'k', ';', 't', 'e', 'a', 'g', 'K', '2', '0', 's', 'u',
-              '_', 'C', '%']
-# characters = [' ', '!', '"', '#', '%', '&', "'", '(', ')', '*', '+', ',', '-',
-#               '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':',
-#               ';', '?', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-#               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-#               'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-#               'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-#               'y', 'z']
+# characters = ['m', 'd', 'l', 'f', 'P', '"', 'R', 'o', 'H', '8', 'W', 'n', 'N',
+#               'h', '*', 'I', 'y', '3', ',', 'X', '.', 'B', 'j', 'Q', ')', 'V',
+#               'M', 'x', '1', 'c', ':', 'T', '?', '!', 'F', "'", '9', '#', 'z',
+#               '6', '5', 'p', 'r', 'Y', '-', 'v', '&', 'O', 'U', '(', 'w', 'A',
+#               'i', 'Z', 'S', '7', 'q', 'G', 'D', 'E', 'J', 'b', '4', ' ', '/',
+#               '+', 'L', 'k', ';', 't', 'e', 'a', 'g', 'K', '2', '0', 's', 'u',
+#               '_', 'C', '%']
+characters = [' ', '!', '"', '#', '%', '&', "'", '(', ')', '*', '+', ',', '-',
+              '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':',
+              ';', '?', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+              'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+              'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+              'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+              'y', 'z']
 char_to_num = StringLookup(vocabulary=list(characters), mask_token=None)
 num_to_char = StringLookup(
     vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
@@ -133,7 +132,8 @@ def levenshteinDistanceDP(token1, token2):
 def decode_batch_predictions(pred):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
     # Use greedy search. For complex tasks, you can use beam search.
-    results = keras.backend.ctc_decode(pred, input_length=input_len, greedy=False, beam_width=100)[0][0][
+    results = keras.backend.ctc_decode(pred, input_length=input_len,
+                                       greedy=False, beam_width=150)[0][0][
         :, :max_len
     ]
     # Iterate over the results and get back the text.
@@ -165,14 +165,16 @@ def distortion_free_resize(image, img_size,to_rgb=True):
         width = pad_width // 2
         pad_width_left = width + 1
         pad_width_right = width
+        pad_width_right = pad_width_left + pad_width_right
     else:
-        pad_width_left = pad_width_right = pad_width // 2
+        # pad_width_left = pad_width_right = pad_width // 2
+        pad_width_right = pad_width
 
     image = tf.pad(
         image,
         paddings=[
             [pad_height_top, pad_height_bottom],
-            [pad_width_left, pad_width_right],
+            [0, pad_width_right],
             [0, 0],
         ],
     )
