@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary" id="crop">Crop</button>
                     </div>
                 </div>
@@ -115,9 +115,8 @@
                 movable: false,
                 rotatable: false,
                 scalable: false,
-                scalableOnTouch: false,
                 zoomOnWheel: false,
-                checkOrientation:false,
+                checkOrientation: false,
             });
 
         }).on('hidden.bs.modal', function() {
@@ -134,7 +133,7 @@
             if (cropper) {
                 canvas = cropper.getCroppedCanvas({});
                 initialPreviewURL = preview.src;
-                preview.src = canvas.toDataURL("image/png",1);
+                preview.src = canvas.toDataURL("image/png", 1);
 
                 base64 = preview.src;
                 process.style.visibility = "visible";
@@ -151,9 +150,9 @@
             data: base64,
             success: function(response) {
                 window.location = "{{url_for('result')}}";
-                $('#loading-image').bind('ajaxStart', function(){
+                $('#loading-image').bind('ajaxStart', function() {
                     $(this).show();
-                }).bind('ajaxStop', function(){
+                }).bind('ajaxStop', function() {
                     $(this).hide();
                 });
             }
