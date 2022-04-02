@@ -34,12 +34,12 @@
                     <p>{{ svm_predict[loop.index0] }}</p>
                     <hr>
                 <h4><b>Suggestions:</b></h4>
-                {% if suggestions[loop.index0]|length < 6 %}
+                {% if suggestions[loop.index0]|length == 0%}
+                    <li>None</li>
+                {% elif suggestions[loop.index0]|length < 6 %}
                     {% for y in suggestions[loop.index0] %}
                         <li style="color:{{ colors[y[0]|int] }};">{{y[1:]}}</li>
                     {% endfor %}
-                {% elif suggestions[loop.index0]|length == 0%}
-                    <li>None</li>
                 {% else %}
                     {% for y in suggestions[loop.index0][:5] %}
                         <li style="color:{{ colors[y[0]|int] }};">{{y[1:]}}</li>

@@ -83,7 +83,7 @@ def suggest(prediction):
         LVD = levenshteinDistanceDP(drugname, prediction.lower())
         if LVD < 5:
             if LVD == 1:
-                return [str(int(LVD))+prediction]
+                return [str(int(LVD))+prediction.title()]
             compare = compare_func(drugname, prediction)
             max_compare = max(compare, max_compare)
             dict_ = str(int(LVD)) + drugname
@@ -98,9 +98,7 @@ def suggest(prediction):
     short_suggest.sort()
     suggestions.sort()
 
-    l_drugs = drugs.values.tolist()
-    l_drugs = [x[0] for x in drugs]
-    short_suggest = difflib.get_close_matches(pred,l_drugs,n=8)
+    short_suggest = difflib.get_close_matches(prediction, short_suggest, n=8)
     return short_suggest
 
 def levenshteinDistanceDP(token1, token2):
@@ -135,9 +133,10 @@ def levenshteinDistanceDP(token1, token2):
 
 def decode_batch_predictions(pred):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
-    results = keras.backend.ctc_decode(pred, input_length=input_len,
-                                       greedy=False, beam_width=150)[0][0][
-        :, :max_len
+    # Use greedy search. For complex tasks, you can use beam search.
+    results = \
+    keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0][
+    :, :max_len
     ]
     # Iterate over the results and get back the text.
     output_text = []
