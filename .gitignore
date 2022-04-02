@@ -2,3 +2,4 @@
 Pharmatech/flask/static/crnn
 Pharmatech/flast/static/svm
 *.pkl
+*.png

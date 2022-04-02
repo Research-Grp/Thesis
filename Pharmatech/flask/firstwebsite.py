@@ -9,6 +9,8 @@ import random
 import string
 import pandas as pd
 import time
+import difflib
+
 import joblib
 from sklearn import svm
 import tensorflow as tf
@@ -28,7 +30,7 @@ def get_random_string(length):
 
 app = Flask(__name__)
 
-new_model = keras.models.load_model('static/crnn/model22')
+new_model = keras.models.load_model('static/crnn/model23')
 predict_model = keras.models.Model(
     new_model.get_layer(name="image").input, new_model.get_layer(name="dense2").output
 )
@@ -74,7 +76,6 @@ def compare_func(drugname,prediction):
     return sum
 
 def suggest(prediction):
-
     suggestions = []
     max_compare = 0
     for x in drugs.iterrows():
@@ -88,7 +89,6 @@ def suggest(prediction):
             dict_ = str(int(LVD)) + drugname
             suggestions.append(dict_)
 
-    # print(max_compare)
     short_suggest = []
     for drugname in suggestions:
         compare = compare_func(drugname, prediction)
@@ -97,7 +97,11 @@ def suggest(prediction):
 
     short_suggest.sort()
     suggestions.sort()
-    return suggestions
+
+    l_drugs = drugs.values.tolist()
+    l_drugs = [x[0] for x in drugs]
+    short_suggest = difflib.get_close_matches(pred,l_drugs,n=8)
+    return short_suggest
 
 def levenshteinDistanceDP(token1, token2):
     distances = np.zeros((len(token1) + 1, len(token2) + 1))
@@ -131,7 +135,6 @@ def levenshteinDistanceDP(token1, token2):
 
 def decode_batch_predictions(pred):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
-    # Use greedy search. For complex tasks, you can use beam search.
     results = keras.backend.ctc_decode(pred, input_length=input_len,
                                        greedy=False, beam_width=150)[0][0][
         :, :max_len
@@ -145,15 +148,13 @@ def decode_batch_predictions(pred):
     return output_text
 
 
-def distortion_free_resize(image, img_size,to_rgb=True):
+def distortion_free_resize(image, img_size,to_rgb=True,svm=False):
     w, h = img_size
     image = tf.image.resize(image, size=(h, w), preserve_aspect_ratio=True)
 
-    # Check tha amount of padding needed to be done.
     pad_height = h - tf.shape(image)[0]
     pad_width = w - tf.shape(image)[1]
 
-    # Only necessary if you want to do same amount of padding on both sides.
     if pad_height % 2 != 0:
         height = pad_height // 2
         pad_height_top = height + 1
