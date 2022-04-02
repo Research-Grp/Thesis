@@ -83,7 +83,7 @@ def suggest(prediction):
         LVD = levenshteinDistanceDP(drugname, prediction.lower())
         if LVD < 5:
             if LVD == 1:
-                return [str(int(LVD))+prediction.title()]
+                return ["1"+drugname.title()]
             compare = compare_func(drugname, prediction)
             max_compare = max(compare, max_compare)
             dict_ = str(int(LVD)) + drugname
@@ -99,7 +99,9 @@ def suggest(prediction):
     suggestions.sort()
 
     short_suggest = difflib.get_close_matches(prediction, short_suggest, n=8)
+    print(short_suggest)
     return short_suggest
+
 
 def levenshteinDistanceDP(token1, token2):
     distances = np.zeros((len(token1) + 1, len(token2) + 1))
@@ -165,32 +167,47 @@ def distortion_free_resize(image, img_size,to_rgb=True,svm=False):
         width = pad_width // 2
         pad_width_left = width + 1
         pad_width_right = width
-        pad_width_right = pad_width_left + pad_width_right
-    else:
-        # pad_width_left = pad_width_right = pad_width // 2
-        pad_width_right = pad_width
+        if not svm:
+            pad_width_right = pad_width_left + pad_width_right
 
-    image = tf.pad(
-        image,
-        paddings=[
-            [pad_height_top, pad_height_bottom],
-            [0, pad_width_right],
-            [0, 0],
-        ],
-    )
+    else:
+        if not svm:
+            pad_width_right = pad_width
+        else:
+            pad_width_left = pad_width_right = pad_width // 2
+    if not svm: # padding right
+        image = tf.pad(
+            image,
+            paddings=[
+                [pad_height_top, pad_height_bottom],
+                [0, pad_width_right],
+                [0, 0],
+            ],
+        )
+    else: #padding middle
+        image = tf.pad(
+            image,
+            paddings=[
+                [pad_height_top, pad_height_bottom],
+                [pad_width_left, pad_width_right],
+                [0, 0],
+            ],
+        )
+
     if to_rgb:
         image = tf.image.grayscale_to_rgb(image)
     image = tf.transpose(image, perm=[1, 0, 2])
     image = tf.image.flip_left_right(image)
     return image
 
-def preprocess_image(image_path, img_size=(image_width, image_height),delete=True,to_rgb=True):
+def preprocess_image(image_path, img_size=(image_width, image_height),
+                     delete=True, to_rgb=True, svm=False):
     image = tf.io.read_file(image_path)
     #remove image after upload
     if delete:
         os.remove(image_path)
     image = tf.image.decode_png(image, 1)
-    image = distortion_free_resize(image, img_size,to_rgb=to_rgb)
+    image = distortion_free_resize(image, img_size,to_rgb=to_rgb,svm=svm)
     image = tf.cast(image, tf.float32) / 255.0
     return image
 
@@ -281,7 +298,7 @@ def result():
                     #make image tf image
                     image = preprocess_image(path_i,delete=False)
                     image_svm = preprocess_image(path_i,img_size=(100,50)
-                                                ,to_rgb=False)
+                                                ,to_rgb=False, svm=True)
                     image_svm = [tf.reshape(image_svm,[-1])]
                     image_expanded = tf.expand_dims(image, 0)
 
@@ -317,7 +334,7 @@ def result():
             cv.imwrite(path_i,img)
             image = preprocess_image(path_i,delete=False)
             image_svm = preprocess_image(path_i, img_size=(100, 50),
-                                         to_rgb=False)
+                                         to_rgb=False, svm=True)
             image_svm = [tf.reshape(image_svm, [-1])]
             image_expanded = tf.expand_dims(image, 0)
 
@@ -337,7 +354,6 @@ def result():
             word_cnn_predict.append(pred_text[0])
             word_svm_predict.append(svm_pred)
             suggestion_list.append(suggest(pred_text[0]))
-        print(suggestion_list)
         end_time = time.time()
         print(end_time - start_time,"s")
     else:
