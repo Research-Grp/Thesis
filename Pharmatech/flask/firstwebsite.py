@@ -271,7 +271,7 @@ def result():
             ret, threshed_img = cv.threshold(blurred_img, 0, 255,
                                              cv.THRESH_BINARY + cv.THRESH_OTSU)
             threshed_img = cv.bitwise_not(threshed_img)
-            kernel = cv.getStructuringElement(cv.MORPH_RECT, (50, 3))
+            kernel = cv.getStructuringElement(cv.MORPH_RECT, (35, 3))
             img_close = cv.morphologyEx(threshed_img, cv.MORPH_CLOSE, kernel)
             img_dilation = cv.dilate(img_close, kernel, iterations=1)
 
