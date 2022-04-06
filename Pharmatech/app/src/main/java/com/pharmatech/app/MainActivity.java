@@ -14,6 +14,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 
@@ -28,9 +29,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl("http://192.168.1.5:5000/");
+//        webView.loadUrl("http://192.168.1.5:5000/");
+        webView.loadUrl("http://10.0.0.34:5000/");
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
+        webView.setWebViewClient(new WebViewClient(){
+            public boolean shoudlOverrideUrlLoading(WebView view, String url){
+                webView.loadUrl("http://10.0.0.34:5000/");
+                return false;
+            }
+        });
         webView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {

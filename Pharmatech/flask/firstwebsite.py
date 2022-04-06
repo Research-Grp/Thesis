@@ -14,9 +14,6 @@ import joblib
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.layers.experimental.preprocessing import StringLookup
-from sklearnex import patch_sklearn
-
-patch_sklearn()
 
 
 def get_random_string(length):
