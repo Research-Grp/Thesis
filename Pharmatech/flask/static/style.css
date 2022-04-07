@@ -62,16 +62,18 @@ img {
 
 
 /*INDEX.HTML*/
-
-#index {
-    overflow-y: auto;
+#header{
+    position: fixed;
+    left: 50%;
+    top: 43%;
+    transform: translate(-50%, -50%);
+    width: 90%;
 }
 
 #main_logo {
     display: block;
     margin-right: auto;
     margin-left: auto;
-    margin-top: 70px;
     width: 400px;
 }
 
