@@ -117,6 +117,10 @@
                 scalable: false,
                 zoomOnWheel: false,
                 checkOrientation: false,
+{#                ready: function (e) {
+                    var imageData = cropper.getImageData();
+                    console.log(imageData.naturalWidth, imageData.naturalHeight);
+                }#}
             });
 
         }).on('hidden.bs.modal', function() {
