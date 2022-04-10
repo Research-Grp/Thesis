@@ -75,6 +75,8 @@
 </script>
 <script>
     var base64;
+    var image_h;
+    var image_w;
     window.addEventListener('DOMContentLoaded', function() {
         var image = document.getElementById('image');
         var $modal = $('#modal');
@@ -117,10 +119,12 @@
                 scalable: false,
                 zoomOnWheel: false,
                 checkOrientation: false,
-{#                ready: function (e) {
+                ready: function (e) {
                     var imageData = cropper.getImageData();
+                    image_w = imageData.naturalWidth
+                    image_h = imageData.naturalHeight
                     console.log(imageData.naturalWidth, imageData.naturalHeight);
-                }#}
+                }
             });
 
         }).on('hidden.bs.modal', function() {
@@ -151,11 +155,12 @@
         $.ajax({
             url: "{{url_for('upload')}}",
             type: 'POST',
-            data: base64,
+            data: {base64,image_h,image_w},
             success: function(response) {
                 window.location = "{{url_for('result')}}";
                 $('#loading-image').bind('ajaxStart', function() {
                     $(this).show();
+
                 }).bind('ajaxStop', function() {
                     $(this).hide();
                 });

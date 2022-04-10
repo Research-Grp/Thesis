@@ -76,7 +76,7 @@ def suggest(prediction):
         drugname = str(x[1][0])
         LVD = levenshtein_distance(drugname, prediction.lower())
         if LVD < 5:
-            if LVD == 1:
+            if LVD == 1 or LVD == 0:
                 return ["1" + drugname.title()]
             compare = compare_func(drugname, prediction)
             max_compare = max(compare, max_compare)
@@ -91,9 +91,11 @@ def suggest(prediction):
 
     short_suggest.sort()
     suggestions.sort()
-
-    short_suggest = difflib.get_close_matches(prediction, short_suggest, n=8)
-    print(short_suggest)
+    print("short_suggest",short_suggest)
+    if len(suggestions) > 4:
+        short_suggest = difflib.get_close_matches(prediction, short_suggest, n=8)
+        short_suggest.sort()
+    print("difflib", short_suggest)
     return short_suggest
 
 
@@ -236,9 +238,9 @@ def about():
     return render_template("about.html")
 
 
-@app.route('/result.html')
+@app.route('/result.html',methods=['POST','GET'])
 def result():
-    if "crop" in session:
+    if "crop" in session and "height" in session and "width" in session:
         image_list = []  # image storage to be shown in html
         word_cnn_predict = []
         suggestion_list = []
@@ -248,14 +250,18 @@ def result():
 
         img = cv.imread(path_c)
 
-        # noinspection PyBroadException
         try:
             os.remove(path_c)
             gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         except:
             session.pop("crop")
+            session.pop("height")
+            session.pop("width")
             return redirect(url_for('upload'))
-
+        default_kernel_size = 35
+        if int(session['width']) > 1500 and int(session['height']) > 2500:
+            default_kernel_size = 50
+        print("kernel_size",default_kernel_size)
         img_h = img.shape[0]
         img_w = img.shape[1]
         print("shape[0]h = ", img_h, " shape[1]w = ", img_w)  # tester
@@ -268,7 +274,7 @@ def result():
             ret, threshed_img = cv.threshold(blurred_img, 0, 255,
                                              cv.THRESH_BINARY + cv.THRESH_OTSU)
             threshed_img = cv.bitwise_not(threshed_img)
-            kernel = cv.getStructuringElement(cv.MORPH_RECT, (35, 3))
+            kernel = cv.getStructuringElement(cv.MORPH_RECT, (default_kernel_size, 3))
             img_close = cv.morphologyEx(threshed_img, cv.MORPH_CLOSE, kernel)
             img_dilation = cv.dilate(img_close, kernel, iterations=1)
 
@@ -375,10 +381,17 @@ def result():
 @app.route('/upload.html', methods=['POST', 'GET'])
 def upload():
     request_method = request.method
+    img_h = None
+    img_w = None
     if request_method == 'POST':
         uri = get_random_string(13) + ".png"
         session["crop"] = uri
-        image64 = request.get_data().decode('ascii').split(',')[1]
+        img_h = request.form.get('image_h')
+        img_w = request.form.get('image_w')
+        session["width"] = img_w
+        session["height"] = img_h
+        image64 = request.form.get('base64').split(',')[1]
+        print(image64[:25],type(image64))
         im = Image.open(BytesIO(base64.b64decode(image64)))
 
         im.save(path_to_cropped + session["crop"], format='png')  # include
