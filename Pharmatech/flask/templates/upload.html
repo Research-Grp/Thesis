@@ -110,11 +110,11 @@
 
         $modal.on('shown.bs.modal', function() {
             cropper = new Cropper(image, {
-                viewMode: 1,
+                viewMode: 2,
+                dragMode:'move',
                 center: true,
                 responsive: true,
                 autoCrop: true,
-                movable: false,
                 rotatable: false,
                 scalable: false,
                 zoomOnWheel: false,
