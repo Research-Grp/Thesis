@@ -12,8 +12,12 @@ import time
 import difflib
 import joblib
 import tensorflow as tf
+import math
 from tensorflow import keras
 from tensorflow.keras.layers.experimental.preprocessing import StringLookup
+from word_beam_search import WordBeamSearch
+# from sklearnex import patch_sklearn
+# patch_sklearn()
 
 
 def get_random_string(length):
@@ -26,7 +30,7 @@ def get_random_string(length):
 
 app = Flask(__name__)
 
-new_model = keras.models.load_model('static/crnn/model23')
+new_model = keras.models.load_model('static/crnn/model25')
 predict_model = keras.models.Model(
     new_model.get_layer(name="image").input,
     new_model.get_layer(name="dense2").output
@@ -54,9 +58,46 @@ characters = [' ', '!', '"', '#', '%', '&', "'", '(', ')', '*', '+', ',', '-',
               'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
               'y', 'z']
 
+word_chars = "'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+chars = ' _!\"#%&\'()*+,-./0123456789:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+corpus = open('static/corpus1.txt').read()
+
+wbs = WordBeamSearch(25, 'Words', 0.0,
+                    corpus.encode('utf8'),
+                    chars.encode('utf8'),
+                    word_chars.encode('utf8'))
+
 char_to_num = StringLookup(vocabulary=list(characters), mask_token=None)
 num_to_char = StringLookup(
     vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
+
+
+def decode_word_beam(pred):
+    predtext = tf.reshape(pred, [22, 1, 82])
+    predtext = predtext.numpy()
+
+    label_str = wbs.compute(predtext)
+    label_str = tf.convert_to_tensor(label_str, dtype="int64")
+    output_text = []
+
+    for res in label_str:
+        res = tf.gather(res, tf.where(tf.math.not_equal(res, -1)))
+        res = tf.strings.reduce_join(num_to_char(res)).numpy().decode("utf-8")
+        output_text.append(res)
+
+    print(output_text)
+    return output_text
+
+
+def get_confidence(pred, num_to_char=num_to_char):
+    input_len = np.ones(pred.shape[0]) * pred.shape[1]
+    # Use greedy search. For complex tasks, you can use beam search
+    decoded = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)
+    accuracy = float(decoded[1][0][0])
+    accuracy = pow(10, -(accuracy)) * 100
+    # accuracy = -(math.log(accuracy, 10))
+    # take the resultin encoded char until it gets -1
+    return accuracy
 
 
 def compare_func(drugname, prediction):
@@ -91,11 +132,12 @@ def suggest(prediction):
 
     short_suggest.sort()
     suggestions.sort()
-    print("short_suggest",short_suggest)
+    # print("short_suggest", short_suggest)
     if len(suggestions) > 4:
-        short_suggest = difflib.get_close_matches(prediction, short_suggest, n=8)
+        short_suggest = difflib.get_close_matches(prediction,
+                                                  short_suggest, n=8)
         short_suggest.sort()
-    print("difflib", short_suggest)
+    # print("difflib", short_suggest)
     return short_suggest
 
 
@@ -129,17 +171,23 @@ def levenshtein_distance(token1, token2):
 def decode_batch_predictions(pred):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
     # Use greedy search. For complex tasks, you can use beam search.
-    results = \
-        keras.backend.ctc_decode(pred,
-                                 input_length=input_len,
-                                 greedy=True)[0][0][:, :max_len]
+    results = keras.backend.ctc_decode(pred,
+                                       input_length=input_len,
+                                       greedy=True)[0][0][:, :max_len]
+
+    confidence = get_confidence(pred)
+    # results = keras.backend.ctc_decode(pred,
+    #                                    input_length=input_len,
+    #                                    greedy=False,
+    #                                    beam_width=150)[0][0][:, :max_len]
     # Iterate over the results and get back the text.
     output_text = []
     for res in results:
         res = tf.gather(res, tf.where(tf.math.not_equal(res, -1)))
         res = tf.strings.reduce_join(num_to_char(res)).numpy().decode("utf-8")
         output_text.append(res)
-    return output_text
+    print("Confidence:", confidence)
+    return output_text,confidence
 
 
 def distortion_free_resize(image, img_size, to_rgb=True, svm=False):
@@ -238,13 +286,15 @@ def about():
     return render_template("about.html")
 
 
-@app.route('/result.html',methods=['POST','GET'])
+@app.route('/result.html', methods=['POST', 'GET'])
 def result():
     if "crop" in session and "height" in session and "width" in session:
         image_list = []  # image storage to be shown in html
         word_cnn_predict = []
         suggestion_list = []
         word_svm_predict = []
+        confidence_list = []
+        svm_confidence_list = []
         contoured_img = None
         path_c = path_to_cropped + str(session["crop"])
 
@@ -258,15 +308,80 @@ def result():
             session.pop("height")
             session.pop("width")
             return redirect(url_for('upload'))
-        default_kernel_size = 35
-        if int(session['width']) > 1500 and int(session['height']) > 2500:
-            default_kernel_size = 50
-        print("kernel_size",default_kernel_size)
+
         img_h = img.shape[0]
         img_w = img.shape[1]
-        print("shape[0]h = ", img_h, " shape[1]w = ", img_w)  # tester
+        # print("shape[0]h = ", img_h, " shape[1]w = ", img_w)  # tester
 
         start_time = time.time()
+
+        IMG_WIDTH = int(session['width'])
+        IMG_HEIGHT = int(session['height'])
+
+        if 800 <= IMG_HEIGHT <= 1200:
+            kernelx = 9
+            kernely = 13
+            lower_area = 500
+            upper_area = 25000
+            contour_height = 10
+            if IMG_HEIGHT > 1000:
+                kernely = 13
+                contour_height = 15
+        elif 1200 < IMG_HEIGHT <= 1600:
+            kernelx = 19
+            kernely = 7
+            lower_area = 900
+            upper_area = 60000
+            contour_height = 15
+        elif 1600 < IMG_HEIGHT <= 2000:
+            kernelx = 26
+            kernely = 10
+            lower_area = 1500
+            upper_area = 90000
+            contour_height = 18
+        elif 2000 < IMG_HEIGHT <= 2400:
+            kernelx = 30
+            kernely = 15
+            lower_area = 1800
+            upper_area = 130000
+            contour_height = 20
+        elif 2400 < IMG_HEIGHT <= 2800:
+            kernelx = 38
+            kernely = 18
+            lower_area = 2600
+            upper_area = 150000
+            contour_height = 25
+        elif 2800 < IMG_HEIGHT <= 3200:
+            kernelx = 43
+            kernely = 19
+            lower_area = 3600
+            upper_area = 200000
+            contour_height = 30
+        elif 3200 < IMG_HEIGHT <= 3600:
+            kernelx = 50
+            kernely = 21
+            lower_area = 4500
+            upper_area = 220000
+            contour_height = 30
+        elif 3600 < IMG_HEIGHT <= 4000:
+            kernelx = 54
+            kernely = 20
+            lower_area = 5000
+            upper_area = 240000
+            contour_height = 35
+        elif IMG_HEIGHT > 4000:
+            kernelx = 58
+            kernely = 22
+            lower_area = 6500
+            upper_area = 250000
+            contour_height = 35
+        else:
+            kernelx = 5
+            kernely = 13
+            lower_area = 500
+            upper_area = 20000
+            contour_height = 10
+
         if img_h > 100 and img_w > 160:  # if image height is greater
             # than 100 pre-process
             print("true")  # tester
@@ -274,7 +389,8 @@ def result():
             ret, threshed_img = cv.threshold(blurred_img, 0, 255,
                                              cv.THRESH_BINARY + cv.THRESH_OTSU)
             threshed_img = cv.bitwise_not(threshed_img)
-            kernel = cv.getStructuringElement(cv.MORPH_RECT, (default_kernel_size, 3))
+            kernel = cv.getStructuringElement(cv.MORPH_RECT,
+                                              (kernelx, kernely))
             img_close = cv.morphologyEx(threshed_img, cv.MORPH_CLOSE, kernel)
             img_dilation = cv.dilate(img_close, kernel, iterations=1)
 
@@ -284,9 +400,8 @@ def result():
             count = 0
             for contour in contours:
                 x, y, w, h = cv.boundingRect(contour)
-                # print("height:",h," width:",w," area:",cv.contourArea(
-                # contour)) #tester
-                if cv.contourArea(contour) > 4000 and h > 50:
+                area = cv.contourArea(contour)
+                if (lower_area < area < upper_area) and h > contour_height:
                     # segmented image to be predicted
                     roi = img[y:y + h, x:x + w]
 
@@ -315,20 +430,33 @@ def result():
                     svm_pred = Categories[
                         svm_model.predict(image_svm)[0]]  # svm prediction
                     pred = predict_model.predict(image_expanded)
-                    pred_text = decode_batch_predictions(
-                        pred)  # crnn prediction
-                    print("prediction:" + str(count + 1), pred_text,
+                    # pred_text = decode_word_beam(pred)  # crnn prediction
+                    # print(decode_batch_predictions(pred))
+                    pred_text, confidence = decode_batch_predictions(pred)
+                    l = [tf.reshape(image_svm, [-1])]
+                    probability = svm_model.predict_proba(l)
+                    svm_confidence = []
+                    for ind, val in enumerate(Categories):
+                        svm_confidence.append(probability[0][ind] * 100)
+                    confidence_s = max(svm_confidence)
+                    confidence_s = f'{confidence_s:.2f}'
+                    confidence = f'{confidence:.2f}'
+                    print("prediction:" + str(count + 1),
+                          pred_text,
                           svm_pred)  # tester
                     # send predictions to html
                     word_cnn_predict.append(pred_text[0])
                     word_svm_predict.append(svm_pred)
                     suggestion_list.append(suggest(pred_text[0]))
+                    confidence_list.append(confidence)
+                    svm_confidence_list.append(confidence_s)
                     count += 1
 
             for contour in contours:
                 x, y, w, h = cv.boundingRect(contour)
-                if cv.contourArea(contour) > 4000 and h > 50:
-                    cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                area = cv.contourArea(contour)
+                if (lower_area < area < upper_area) and h > contour_height:
+                    cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 3)
 
             # convert image to png before converting to base64
             # pass image to through jinja template
@@ -360,12 +488,23 @@ def result():
             # predict image
             svm_pred = Categories[svm_model.predict(image_svm)[0]]
             pred = predict_model.predict(image_expanded)
-            pred_text = decode_batch_predictions(pred)
+            # pred_text = decode_batch_predictions(pred)
+            # pred_text = decode_word_beam(pred)
+            pred_text,confidence = decode_batch_predictions(pred)
+            l = [tf.reshape(image_svm, [-1])]
+            probability = svm_model.predict_proba(l)
+            svm_confidence = []
+            for ind, val in enumerate(Categories):
+                svm_confidence.append(probability[0][ind] * 100)
+            confidence_s = max(svm_confidence)
+            confidence = f'{confidence:.2f}'
             print("prediction:", pred_text, svm_pred)  # tester
             # send predictions to html
             word_cnn_predict.append(pred_text[0])
             word_svm_predict.append(svm_pred)
             suggestion_list.append(suggest(pred_text[0]))
+            confidence_list.append(confidence)
+            svm_confidence_list.append(confidence_s)
         end_time = time.time()
         print(end_time - start_time, "s")
     else:
@@ -375,14 +514,14 @@ def result():
                            cnn_predict=word_cnn_predict,
                            svm_predict=word_svm_predict,
                            images=image_list,
-                           suggestions=suggestion_list)
+                           suggestions=suggestion_list,
+                           confidence=confidence_list,
+                           svm_confidence=svm_confidence_list)
 
 
 @app.route('/upload.html', methods=['POST', 'GET'])
 def upload():
     request_method = request.method
-    img_h = None
-    img_w = None
     if request_method == 'POST':
         uri = get_random_string(13) + ".png"
         session["crop"] = uri
@@ -391,7 +530,8 @@ def upload():
         session["width"] = img_w
         session["height"] = img_h
         image64 = request.form.get('base64').split(',')[1]
-        print(image64[:25],type(image64))
+        print(session['width'], session['height'], "size")
+        print(image64[:25], type(image64))
         im = Image.open(BytesIO(base64.b64decode(image64)))
 
         im.save(path_to_cropped + session["crop"], format='png')  # include

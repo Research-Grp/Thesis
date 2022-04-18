@@ -29,9 +29,11 @@
             <div class="containerResults">
                 <h4><b>Prediction:</b></h4>
                     <p>{{x}}</p>
+                    <p>Confidence: {{ confidence[loop.index0] }}%</p>
                     <hr>
                 <h4><b>Classification:</b></h4>
                     <p>{{ svm_predict[loop.index0] }}</p>
+                    <p>Confidence: {{ svm_confidence[loop.index0] }}%</p>
                     <hr>
                 <h4><b>Suggestions:</b></h4>
                 {% if suggestions[loop.index0]|length == 0%}
