@@ -110,7 +110,7 @@
 
         $modal.on('shown.bs.modal', function() {
             cropper = new Cropper(image, {
-                viewMode: 2,
+                viewMode: 3,
                 dragMode:'move',
                 center: true,
                 responsive: true,
@@ -119,6 +119,7 @@
                 scalable: false,
                 zoomOnWheel: false,
                 checkOrientation: false,
+                background:false,
                 ready: function (e) {
                     var imageData = cropper.getImageData();
                     image_w = imageData.naturalWidth
