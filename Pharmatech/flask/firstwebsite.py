@@ -15,9 +15,6 @@ import tensorflow as tf
 import math
 from tensorflow import keras
 from tensorflow.keras.layers.experimental.preprocessing import StringLookup
-from word_beam_search import WordBeamSearch
-# from sklearnex import patch_sklearn
-# patch_sklearn()
 
 
 def get_random_string(length):
@@ -58,35 +55,10 @@ characters = [' ', '!', '"', '#', '%', '&', "'", '(', ')', '*', '+', ',', '-',
               'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
               'y', 'z']
 
-word_chars = "'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-chars = ' _!\"#%&\'()*+,-./0123456789:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-corpus = open('static/corpus1.txt').read()
-
-wbs = WordBeamSearch(25, 'Words', 0.0,
-                    corpus.encode('utf8'),
-                    chars.encode('utf8'),
-                    word_chars.encode('utf8'))
 
 char_to_num = StringLookup(vocabulary=list(characters), mask_token=None)
 num_to_char = StringLookup(
     vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
-
-
-def decode_word_beam(pred):
-    predtext = tf.reshape(pred, [22, 1, 82])
-    predtext = predtext.numpy()
-
-    label_str = wbs.compute(predtext)
-    label_str = tf.convert_to_tensor(label_str, dtype="int64")
-    output_text = []
-
-    for res in label_str:
-        res = tf.gather(res, tf.where(tf.math.not_equal(res, -1)))
-        res = tf.strings.reduce_join(num_to_char(res)).numpy().decode("utf-8")
-        output_text.append(res)
-
-    print(output_text)
-    return output_text
 
 
 def get_confidence(pred, num_to_char=num_to_char):
@@ -95,8 +67,7 @@ def get_confidence(pred, num_to_char=num_to_char):
     decoded = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)
     accuracy = float(decoded[1][0][0])
     accuracy = pow(10, -(accuracy)) * 100
-    # accuracy = -(math.log(accuracy, 10))
-    # take the resultin encoded char until it gets -1
+
     return accuracy
 
 
@@ -311,80 +282,54 @@ def result():
 
         img_h = img.shape[0]
         img_w = img.shape[1]
-        # print("shape[0]h = ", img_h, " shape[1]w = ", img_w)  # tester
 
         start_time = time.time()
 
         IMG_WIDTH = int(session['width'])
         IMG_HEIGHT = int(session['height'])
 
-        if 800 <= IMG_HEIGHT <= 1200:
+        if IMG_HEIGHT < 800:
+            kernelx = 7
+            kernely = 11
+            lower_area = 300
+            upper_area = 30000
+            contour_height = 8
+        elif 800 <= IMG_HEIGHT <= 1200:
             kernelx = 9
             kernely = 13
             lower_area = 500
-            upper_area = 25000
+            upper_area = 50000
             contour_height = 10
             if IMG_HEIGHT > 1000:
-                kernely = 13
+                kernelx = 10
                 contour_height = 15
         elif 1200 < IMG_HEIGHT <= 1600:
-            kernelx = 19
+            kernelx = 23
             kernely = 7
             lower_area = 1000
-            upper_area = 60000
-            contour_height = 15
-        elif 1600 < IMG_HEIGHT <= 2000:
-            kernelx = 26
-            kernely = 10
-            lower_area = 2000
             upper_area = 90000
-            contour_height = 18
-        elif 2000 < IMG_HEIGHT <= 2400:
-            kernelx = 30
-            kernely = 15
-            lower_area = 2500
-            upper_area = 130000
-            contour_height = 20
-        elif 2400 < IMG_HEIGHT <= 2800:
-            kernelx = 38
-            kernely = 18
-            lower_area = 3000
-            upper_area = 150000
-            contour_height = 25
-        elif 2800 < IMG_HEIGHT <= 3200:
-            kernelx = 44
-            kernely = 20
-            lower_area = 3800
-            upper_area = 200000
-            contour_height = 30
-        elif 3200 < IMG_HEIGHT <= 3600:
-            kernelx = 52
-            kernely = 22
-            lower_area = 5000
-            upper_area = 220000
-            contour_height = 30
-        elif 3600 < IMG_HEIGHT <= 4000:
-            kernelx = 58
-            kernely = 24
-            lower_area = 6500
-            upper_area = 240000
-            contour_height = 35
-        elif IMG_HEIGHT > 4000:
-            kernelx = 64
-            kernely = 26
-            lower_area = 7500
-            upper_area = 250000
-            contour_height = 35
+            contour_height = 15
         else:
-            kernelx = 5
-            kernely = 13
-            lower_area = 500
-            upper_area = 20000
-            contour_height = 10
+            kernelx = 30
+            kernely = 9
+            lower_area = 1500
+            upper_area = 130000
+            contour_height = 17
 
-        if img_h > 100 and img_w > 160:  # if image height is greater
-            # than 100 pre-process
-            print("true")  # tester
+
+        print("Image height,width: ", IMG_HEIGHT,IMG_WIDTH)
+        print("kernel", kernelx)
+
+        if IMG_WIDTH > 300 and IMG_HEIGHT > 700:
+            conf_flag = 1
+            print("hello")
+        else:
+            print("hi")
+            conf_flag = 0
+
+        if (img_h > int(IMG_HEIGHT/5) or img_w > int(IMG_WIDTH/2)) and \
+                conf_flag == 1:
+
             blurred_img = cv.GaussianBlur(gray_img, (7, 7), 0)
             ret, threshed_img = cv.threshold(blurred_img, 0, 255,
                                              cv.THRESH_BINARY + cv.THRESH_OTSU)
@@ -408,8 +353,10 @@ def result():
                     # append to image_list for image showing in html
                     # convert image to png before converting to base64
                     _, roi_buffered = cv.imencode('.png', roi)
+
                     roi_img = base64.b64encode(roi_buffered).decode("utf-8")
                     roi_img = "data:image/png;base64, " + roi_img
+
                     image_list.append(roi_img)
 
                     # save image and delete
@@ -430,14 +377,15 @@ def result():
                     svm_pred = Categories[
                         svm_model.predict(image_svm)[0]]  # svm prediction
                     pred = predict_model.predict(image_expanded)
-                    # pred_text = decode_word_beam(pred)  # crnn prediction
-                    # print(decode_batch_predictions(pred))
+
                     pred_text, confidence = decode_batch_predictions(pred)
                     l = [tf.reshape(image_svm, [-1])]
                     probability = svm_model.predict_proba(l)
                     svm_confidence = []
+
                     for ind, val in enumerate(Categories):
                         svm_confidence.append(probability[0][ind] * 100)
+
                     confidence_s = max(svm_confidence)
                     confidence_s = f'{confidence_s:.2f}'
                     confidence = f'{confidence:.2f}'
@@ -455,6 +403,7 @@ def result():
             for contour in contours:
                 x, y, w, h = cv.boundingRect(contour)
                 area = cv.contourArea(contour)
+                print("area", area)
                 if (lower_area < area < upper_area) and h > contour_height:
                     cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 3)
 
@@ -466,8 +415,6 @@ def result():
             # print(contoured_img[:310],type(contoured_img)) #tester
 
         else:  # else put inside processed_img folder
-            print("false: smaller than 100,160")
-
             # save image and delete
             path_i = path_to_segmented_img + str(
                 session["crop"])
@@ -497,6 +444,7 @@ def result():
             for ind, val in enumerate(Categories):
                 svm_confidence.append(probability[0][ind] * 100)
             confidence_s = max(svm_confidence)
+            confidence_s = f'{confidence_s:.2f}'
             confidence = f'{confidence:.2f}'
             print("prediction:", pred_text, svm_pred)  # tester
             # send predictions to html

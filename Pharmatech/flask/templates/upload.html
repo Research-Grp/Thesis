@@ -77,8 +77,11 @@
     var base64;
     var image_h;
     var image_w;
+    var goalHeight = 2000;
+    var goalWidth = 1500;
     window.addEventListener('DOMContentLoaded', function() {
         var image = document.getElementById('image');
+
         var $modal = $('#modal');
         var cropper;
 
@@ -109,6 +112,7 @@
         });
 
         $modal.on('shown.bs.modal', function() {
+
             cropper = new Cropper(image, {
                 viewMode: 3,
                 dragMode:'move',
@@ -122,10 +126,10 @@
                 background:false,
                 ready: function (e) {
                     var imageData = cropper.getImageData();
-                    image_w = imageData.naturalWidth
-                    image_h = imageData.naturalHeight
-                    console.log(imageData.naturalWidth, imageData.naturalHeight);
+                    image_w = imageData.naturalWidth;
+                    image_h = imageData.naturalHeight;
                 }
+
             });
 
         }).on('hidden.bs.modal', function() {
@@ -149,6 +153,51 @@
             }
         });
     });
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext("2d");
+
+    image.onload = function() {
+        image_h = image.naturalHeight;
+        image_w = image.naturalWidth;
+        var ratio = 0;
+
+        if (image_h > image_w) {
+            if (image_h > goalHeight || image_w > goalWidth) {
+                if (image_h > goalHeight) {
+                    ratio = goalHeight / image_h;
+                    image_w *= ratio;
+                    image_h = goalHeight;
+                } else if (image_w > goalWidth) {
+                    ratio = goalWidth / image_w;
+                    image_w = goalWidth;
+                    image_h *= ratio;
+                }
+                canvas.width = image_w;
+                canvas.height = image_h;
+
+                ctx.drawImage(image, 0, 0, image_w, image_h);
+
+                canvasURL = canvas.toDataURL('image/png', 1);
+                image.src = canvasURL;
+            }
+        } else {
+            if (image_w > goalWidth && image_h > goalHeight) {
+                ratio = goalHeight / image_h;
+                image_w *= ratio;
+                image_h = goalHeight;
+
+                canvas.width = image_w;
+                canvas.height = image_h;
+
+                ctx.drawImage(image, 0, 0, image_w, image_h);
+
+                canvasURL = canvas.toDataURL('image/png', 1);
+                image.src = canvasURL;
+            }
+        }
+        console.log("width height", image_w, image_h);
+    };
 
     function uploadPhoto() {
         $('#loading-image').show();
