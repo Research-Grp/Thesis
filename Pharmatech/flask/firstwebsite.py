@@ -103,12 +103,12 @@ def suggest(prediction):
 
     short_suggest.sort()
     suggestions.sort()
-    # print("short_suggest", short_suggest)
+    print("short_suggest", short_suggest)
     if len(suggestions) > 4:
-        short_suggest = difflib.get_close_matches(prediction,
+        short_suggest = difflib.get_close_matches(prediction.title(),
                                                   short_suggest, n=8)
         short_suggest.sort()
-    # print("difflib", short_suggest)
+    print("difflib", short_suggest)
     return short_suggest
 
 
