@@ -212,23 +212,66 @@ img {
     box-shadow: 0px 15px 15px rgb(0, 0, 0);
     width: 90%;
     border-radius: 30px;
-    background-color: white;
     margin-top: 50px;
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 50px;
-    padding-bottom: 20px;
 }
 
 .card2 {
     box-shadow: 0px 15px 15px rgb(0, 0, 0);
     width: 90%;
     border-radius: 30px;
+    margin-top: 50px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 30px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     background-color: white;
+}
+
+.cont2 {
+    box-shadow: 0px 15px 15px rgb(0, 0, 0);
+    width: 85%;
+    border-radius: 30px;
     margin-top: 50px;
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 50px;
+    padding: 10px 10px 10px 20px;
+    background-color: white;
+}
+
+#warning{
+    color: #ffae42;
+}
+
+#warnMessage{
+    margin-left: 20px;
+    margin-right: 20px;
+    color: white;
+    opacity: 60%;
+    text-align: center;
+}
+
+.showButton{
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: white;
+    border: none;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    background: none;
+    text-decoration: underline;
+}
+
+#boundingMedipic{
+    border-radius: 30px 30px 30px 30px;
+    width: 100%;
 }
 
 #medipic {
@@ -249,6 +292,21 @@ img {
     display: none;
 }
 
+.more{
+    width: 100%;
+    margin-top: 50px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 50px;
+}
+
+.popUp {
+    position: relative;
+    box-shadow: 0px 15px 15px rgb(0, 0, 0);
+    width: 100%;
+    border-radius: 30px;
+    background-color: white;
+}
 
 /*about.html*/
 
