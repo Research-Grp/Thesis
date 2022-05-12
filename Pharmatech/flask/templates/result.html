@@ -1,3 +1,15 @@
+<!--
+HANDWRITTEN TEXT RECOGNITION OF MEDICAL PRESCRIPTION
+USING CONVOLUTIONAL RECURRENT NERUAL NETWORK
+
+Kaycee L. Ballesteros
+Ivee L. Jintalan
+Mendrix C. Manlangit
+BSCS 4 - A
+
+This is the user interface for the recognized images.
+-->
+
 <!DOCTYPE HTML>
 <html>
 
@@ -18,9 +30,14 @@
 {% set colors = ["","#28A129","#69B34C","#ACB334","#FAB733","#FF8E15","#FF4E11","#FF0D0D"] %}
 <!-- set green to red pos2"#2DB32E" -->
     <div id="resultContainer">
-        {% if cont_img != None: %}
+
         <div class="card">
-            <img src="{{cont_img}}" id="boundingMedipic" style="width:100%">
+            {% if cont_img != None: %}
+                <img src="{{cont_img}}" id="boundingMedipic" style="width:100%">
+
+            {% else %}
+                <img src="{{images[0]}}" id="boundingMedipic" style="width:100%">
+            {% endif %}
         </div>
 
             <p id="warnMessage"><i id="warning" class="fa fa-warning"></i> Disclaimer: The predictions given by the model are not 100% accurate. Use prediction with caution.</p>
@@ -29,10 +46,12 @@
           <h4><b>Prediction: </b></h4>
             <hr>
           <div>
-            <p>Lorem ipsum dolor sit amet. Non illum quaerat 33 vitae tempora aut sunt consequatur quo neque aspernatur non earum perferendis.</p>
+              {% for x in cnn_predict %}
+              <p>{{word_count[loop.index0]}}. {{x}}</p>
+              {% endfor %}
           </div>
         </div>
-        {% endif %}
+
 
         <button class="showButton">Show/Hide...</button>
 

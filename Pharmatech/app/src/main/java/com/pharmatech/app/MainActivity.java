@@ -30,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
 
         WebView webView = (WebView) findViewById(R.id.webView);
 //        webView.loadUrl("http://192.168.1.5:5000/");
-        webView.loadUrl("http://10.0.0.34:5000/");
+        webView.loadUrl("http://192.168.205.49:5000");
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
 
         webView.setWebViewClient(new WebViewClient(){
             public boolean shoudlOverrideUrlLoading(WebView view, String url){
-                webView.loadUrl("http://10.0.0.34:5000/");
+                webView.loadUrl("http://192.168.205.49:5000");
                 return false;
             }
         });
