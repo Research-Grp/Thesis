@@ -45,9 +45,13 @@ This is the user interface for the recognized images.
         <div class="cont2">
           <h4><b>Prediction: </b></h4>
             <hr>
-          <div>
+          <div id="boxes">
               {% for x in cnn_predict %}
-              <p>{{word_count[loop.index0]}}. {{x}}</p>
+              <span id=num">{{word_count[loop.index0]}}. </span>
+                  {% for y in x %}
+                      <p id="box">{{y}}</p>
+                      {% endfor %}
+                  <br>
               {% endfor %}
           </div>
         </div>
@@ -62,7 +66,11 @@ This is the user interface for the recognized images.
                     <img src="{{images[loop.index0]}}" id="medipic">
                     <div class="containerResults">
                         <h4><b>Prediction:</b></h4>
-                            <p>{{x}}</p>
+                            <div id="boxes">
+                                {% for y in x %}
+                                    <p id="box">{{y}}</p>
+                                {% endfor %}
+                            </div>
                             <p>Confidence: {{ confidence[loop.index0] }}%</p>
                             <hr>
                         <h4><b>Classification:</b></h4>
