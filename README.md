@@ -1,4 +1,4 @@
-# Handwritten Text Recognition of Medical Prescription Using Convolutional Recurrent Neural Network
+# Pharmatech: Handwritten Text Recognition of Medical Prescription Using Convolutional Recurrent Neural Network
 
 An ML-based WebView application that extracts handwritten texts from medical prescriptions and converts them into readable digital texts. The machine learning model was built and trained using different python libraries, including Tensorflow, Keras, and OpenCV. Several technologies were also used to create the WebView application such as HTML, CSS, Javascript, and Flask.
 
